@@ -1,3 +1,15 @@
+@media (min-width: 1536px){
+
+.container {
+    max-width: 1366px !important;
+}
+}
+
+.hover\:text-gray-900:hover {
+    --tw-text-opacity: 1;
+    color: #a975fd;
+}
+
 h1 {
     font-size: 2.25rem;
     line-height: 2.5rem;
@@ -9,4 +21,19 @@ h1 {
 }
 .height-auto{
 	height: auto !important;
+}
+
+.bg-1{
+	background: #1a0240;
+}
+
+.bg-2{
+	background: #310080;
+}
+
+.text-white{
+	color: white;
+}
+.text-light{
+	color:#a975fd;
 }
