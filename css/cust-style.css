@@ -1,0 +1,12 @@
+h1 {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    font-weight: 900 !important;
+}
+
+.f-weight900 {
+    font-weight: 900 !important;
+}
+.height-auto{
+	height: auto !important;
+}
