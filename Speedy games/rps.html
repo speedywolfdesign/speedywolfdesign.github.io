@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock Paper Scissors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">✊✋✌️</span>
+          <h1>ROCK PAPER SCISSORS</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="rpsReset" class="btn primary">Reset</button>
+        </div>
+      </header>
+
+      <main class="rps-layout">
+        <section class="rps-card glass">
+          <div class="rps-play">
+            <div class="rps-emoji" id="rpsYouEmoji">❔</div>
+            <div class="rps-vs">vs</div>
+            <div class="rps-emoji" id="rpsCpuEmoji">❔</div>
+          </div>
+          <div class="rps-buttons">
+            <button class="btn" data-move="rock" aria-label="Rock">✊</button>
+            <button class="btn" data-move="paper" aria-label="Paper">✋</button>
+            <button class="btn" data-move="scissors" aria-label="Scissors">✌️</button>
+          </div>
+          <div class="rps-status" id="rpsStatus">Make your move</div>
+          <div class="rps-scores">You: <strong id="rpsYou">0</strong> • CPU: <strong id="rpsCpu">0</strong></div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Beat the CPU • First to 5</span>
+      </footer>
+    </div>
+
+    <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
+      <div class="content glass">
+        <h2 id="modalTitle">Match Over</h2>
+        <p id="modalText"></p>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="modalRestart" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="rps.js"></script>
+  </body>
+  </html>
+
+

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">✦</span>
+          <h1>NEON GAMES</h1>
+        </div>
+        <div class="header-actions">
+          <button id="musicBtnHome" class="btn">Music: Off</button>
+        </div>
+      </header>
+
+      <main class="home-layout">
+        <section class="tiles">
+          <a class="tile glass" href="chess.html">
+            <div class="tile-icon">♟</div>
+            <div class="tile-title">Chess Time</div>
+            <div class="tile-sub">Two Player • Neon UI</div>
+          </a>
+          <a class="tile glass" href="flappy.html">
+            <div class="tile-icon">🕊</div>
+            <div class="tile-title">Neon Flappy</div>
+            <div class="tile-sub">Avoid Pipes • Beat Your Best</div>
+          </a>
+          <a class="tile glass" href="snake.html">
+            <div class="tile-icon">🐍</div>
+            <div class="tile-title">Snake</div>
+            <div class="tile-sub">Eat food • Don't crash</div>
+          </a>
+          <a class="tile glass" href="tictactoe.html">
+            <div class="tile-icon">❌⭕</div>
+            <div class="tile-title">Tic-Tac-Toe</div>
+            <div class="tile-sub">Two Player • 3 in a row</div>
+          </a>
+          <a class="tile glass" href="pong.html">
+            <div class="tile-icon">🏓</div>
+            <div class="tile-title">Pong</div>
+            <div class="tile-sub">Two Player • Canvas</div>
+          </a>
+          <a class="tile glass" href="guess.html">
+            <div class="tile-icon">🔢</div>
+            <div class="tile-title">Guess the Number</div>
+            <div class="tile-sub">1–100 • Attempts</div>
+          </a>
+          <a class="tile glass" href="hangman.html">
+            <div class="tile-icon">🔤</div>
+            <div class="tile-title">Hangman</div>
+            <div class="tile-sub">6 mistakes • Random words</div>
+          </a>
+          <a class="tile glass" href="memory.html">
+            <div class="tile-icon">🃏</div>
+            <div class="tile-title">Memory Match</div>
+            <div class="tile-sub">Flip to match pairs</div>
+          </a>
+          <a class="tile glass" href="uno.html">
+            <div class="tile-icon">🟥</div>
+            <div class="tile-title">UNO</div>
+            <div class="tile-sub">Player vs CPU</div>
+          </a>
+          <a class="tile glass" href="breakout.html">
+            <div class="tile-icon">🧱</div>
+            <div class="tile-title">Breakout</div>
+            <div class="tile-sub">Bricks • Lives</div>
+          </a>
+          <a class="tile glass" href="simon.html">
+            <div class="tile-icon">🎶</div>
+            <div class="tile-title">Simon Says</div>
+            <div class="tile-sub">Repeat the sequence</div>
+          </a>
+          <a class="tile glass" href="rps.html">
+            <div class="tile-icon">✊✋✌️</div>
+            <div class="tile-title">Rock Paper Scissors</div>
+            <div class="tile-sub">Beat the CPU</div>
+          </a>
+          <a class="tile glass" href="2048.html">
+            <div class="tile-icon">🔲</div>
+            <div class="tile-title">2048</div>
+            <div class="tile-sub">Merge to 2048</div>
+          </a>
+          <!-- Future tiles can be added here -->
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Pick a game to begin</span>
+      </footer>
+    </div>
+
+    <script src="audio.js"></script>
+    <script>
+      (function(){
+        const btn = document.getElementById('musicBtnHome');
+        if (!btn || typeof createChiptune !== 'function') return;
+        const music = createChiptune('default');
+        btn.addEventListener('click', () => {
+          if (music.isPlaying()) { music.pause(); btn.textContent = 'Music: Off'; }
+          else { music.play(); btn.textContent = 'Music: On'; }
+        });
+      })();
+    </script>
+  </body>
+  </html>
+
+

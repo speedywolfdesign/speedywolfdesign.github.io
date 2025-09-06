@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Tic-Tac-Toe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">❌⭕</span>
+          <h1>NEON TIC-TAC-TOE</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="tttReset" class="btn primary">Reset</button>
+        </div>
+      </header>
+
+      <main class="ttt-layout">
+        <section class="ttt-wrapper glass">
+          <div id="tttStatus" class="ttt-status">X to move</div>
+          <div id="tttBoard" class="ttt-grid" role="grid" aria-label="Tic Tac Toe"></div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Two Player • First to 3 in a row</span>
+      </footer>
+    </div>
+
+    <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
+      <div class="content glass">
+        <h2 id="modalTitle">Game Over</h2>
+        <p id="modalText"></p>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="modalRestart" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="tictactoe.js"></script>
+  </body>
+  </html>
+
+
