@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Hangman</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">🔤</span>
+          <h1>NEON HANGMAN</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="hangmanReset" class="btn primary">New Word</button>
+        </div>
+      </header>
+
+      <main class="hangman-layout">
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="hangman-card glass" style="margin:0;">
+                    <canvas id="hangmanCanvas" class="hangman-canvas" width="420" height="300" aria-label="Hangman" role="img"></canvas>
+                    <div class="hangman-word" id="hangmanWord">_ _ _ _</div>
+                    <div class="hangman-hint">Hint: <span id="hangmanHint"></span></div>
+                    <div class="hangman-letters" id="hangmanLetters"></div>
+                    <div class="hangman-wrong">Wrong: <span id="hangmanWrong">0</span> / 6</div>
+                    <div class="hangman-msg" id="hangmanMsg">Press letters on your keyboard</div>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Guess letters • 6 mistakes allowed</span>
+      </footer>
+    </div>
+
+    <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
+      <div class="content glass">
+        <h2 id="modalTitle">Game Over</h2>
+        <p id="modalText"></p>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="modalRestart" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="hangman.js"></script>
+  </body>
+  </html>
+
+

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guess the Number</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">🔢</span>
+          <h1>GUESS THE NUMBER</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="resetGuess" class="btn primary">New Game</button>
+        </div>
+      </header>
+
+      <main class="guess-layout">
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="guess-card glass" style="margin:0;">
+                    <h2 class="guess-title">Pick 1–100</h2>
+                    <div class="guess-controls">
+                      <input id="guessInput" type="number" min="1" max="100" placeholder="Enter guess" />
+                      <button id="guessBtn" class="btn">Guess</button>
+                      <div style="align-self:center">Attempts: <strong id="attempts">0</strong></div>
+                    </div>
+                    <div id="guessMsg" class="guess-msg">Make your first guess!</div>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Simple guessing game • Try to beat your best</span>
+      </footer>
+    </div>
+
+    <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
+      <div class="content glass">
+        <h2 id="modalTitle">You got it!</h2>
+        <p id="modalText"></p>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="modalRestart" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="guess.js"></script>
+  </body>
+  </html>
+
+

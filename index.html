@@ -1,156 +1,115 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="/path/to/tailwind.css" rel="stylesheet">
-  <link href="css/style.css" rel="stylesheet">
-  <link href="css/cust-style.css" rel="stylesheet">
-  <!-- <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet"> -->
-  <!-- ... -->
-</head>
-<body>
-<header class="text-gray-700 body-font bg-1">
-  <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-    <a href="index.html" class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-      <span class="text-xl text-white">TheSpeedyWolf</span>
-    </a>
-    <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center text-white">
-      <a href="index.html"class="mr-5 hover:text-gray-900">Portfolio</a>
-      <a href="aboutme.html" class="mr-5 hover:text-gray-900">About me</a>
-      <!-- <a href="aboutme.html" class="mr-5 hover:text-gray-900">Skills Showoff</a> -->
-      <a href="contact.html" class="mr-5 hover:text-gray-900">Contact</a>
-    </nav>
-  </div>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">✦</span>
+          <h1>NEON GAMES</h1>
+        </div>
+        <div class="header-actions">
+          <button id="musicBtnHome" class="btn">Music: Off</button>
+        </div>
+      </header>
 
-  <!-- ... -->
+      <main class="home-layout">
+        <section class="tiles">
+          <a class="tile glass" href="chess.html">
+            <div class="tile-icon">♟</div>
+            <div class="tile-title">Chess Time</div>
+            <div class="tile-sub">Two Player • Neon UI</div>
+          </a>
+          <a class="tile glass" href="flappy.html">
+            <div class="tile-icon">🕊</div>
+            <div class="tile-title">Neon Flappy</div>
+            <div class="tile-sub">Avoid Pipes • Beat Your Best</div>
+          </a>
+          <a class="tile glass" href="snake.html">
+            <div class="tile-icon">🐍</div>
+            <div class="tile-title">Snake</div>
+            <div class="tile-sub">Eat food • Don't crash</div>
+          </a>
+          <a class="tile glass" href="tictactoe.html">
+            <div class="tile-icon">❌⭕</div>
+            <div class="tile-title">Tic-Tac-Toe</div>
+            <div class="tile-sub">Two Player • 3 in a row</div>
+          </a>
+          <a class="tile glass" href="pong.html">
+            <div class="tile-icon">🏓</div>
+            <div class="tile-title">Pong</div>
+            <div class="tile-sub">Two Player • Canvas</div>
+          </a>
+          <a class="tile glass" href="guess.html">
+            <div class="tile-icon">🔢</div>
+            <div class="tile-title">Guess the Number</div>
+            <div class="tile-sub">1–100 • Attempts</div>
+          </a>
+          <a class="tile glass" href="hangman.html">
+            <div class="tile-icon">🔤</div>
+            <div class="tile-title">Hangman</div>
+            <div class="tile-sub">6 mistakes • Random words</div>
+          </a>
+          <a class="tile glass" href="memory.html">
+            <div class="tile-icon">🃏</div>
+            <div class="tile-title">Memory Match</div>
+            <div class="tile-sub">Flip to match pairs</div>
+          </a>
+          <a class="tile glass" href="uno.html">
+            <div class="tile-icon">🟥</div>
+            <div class="tile-title">UNO</div>
+            <div class="tile-sub">Player vs CPU</div>
+          </a>
+          <a class="tile glass" href="breakout.html">
+            <div class="tile-icon">🧱</div>
+            <div class="tile-title">Breakout</div>
+            <div class="tile-sub">Bricks • Lives</div>
+          </a>
+          <a class="tile glass" href="simon.html">
+            <div class="tile-icon">🎶</div>
+            <div class="tile-title">Simon Says</div>
+            <div class="tile-sub">Repeat the sequence</div>
+          </a>
+          <a class="tile glass" href="rps.html">
+            <div class="tile-icon">✊✋✌️</div>
+            <div class="tile-title">Rock Paper Scissors</div>
+            <div class="tile-sub">Beat the CPU</div>
+          </a>
+          <a class="tile glass" href="2048.html">
+            <div class="tile-icon">🔲</div>
+            <div class="tile-title">2048</div>
+            <div class="tile-sub">Merge to 2048</div>
+          </a>
+          <!-- Future tiles can be added here -->
+        </section>
+      </main>
 
-
-<section class="text-gray-00 body-font bg-2">
-<div class="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center">
-    <div class="lg:w-2/3 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left md:mb-0 items-center text-center">
-      <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900 mb-2 text-white">Hello! I’m Atish Ghaste,
-        <div class="h-1 w-20 bg-indigo-500 rounded"></div>
-        <!--  <br class="hidden lg:inline-block">Ui/Ux Designer form India, currently working as Sr. Ux designer at Coditas. -->
-      </h1>
-      <h2 class="title-font sm:text-2xl text-xl font-regular text-gray-900 mb-3 text-light">Ui/Ux Designer form India, currently working as Sr. Ux designer at Coditas.</h2>
+      <footer class="app-footer">
+        <span>Pick a game to begin</span>
+      </footer>
     </div>
-</section>
 
-<hr>
-<section class="text-gray-700 body-font">
-  <div class="container mx-auto flex px-5 py-16 md:flex-row flex-col items-center">
-    <div class="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
-       <a href="c1.html" class="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">
-      <img class="object-cover object-center rounded" alt="hero" src="images/markid-2.png"></a>
-    </div>
-    <div class="lg:flex-grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
-      <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">Markid
-        <br class="hidden lg:inline-block">Parents market place
-      </h1>
-       <p class="title-font font-medium text-gray-900 text-m mb-4">Role: End-to-End Solo Ux/Ui Designer</p>
-      <p class="mb-8 leading-relaxed">Markid is a PARENT marketplace where parents can connect to buy and sell kids preloved, gently used items - easily and trustfully. </p>
-      <div class="flex justify-center">
-      <a href="c1.html" class="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">Read Case Study
-        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-          <path d="M5 12h14M12 5l7 7-7 7"></path>
-        </svg>
-      </a>
-      </div>
-    </div>
-  </div>
-</section>
+    <script src="audio.js"></script>
+    <script>
+      (function(){
+        const btn = document.getElementById('musicBtnHome');
+        if (!btn || typeof createChiptune !== 'function') return;
+        const music = createChiptune('default');
+        btn.addEventListener('click', () => {
+          if (music.isPlaying()) { music.pause(); btn.textContent = 'Music: Off'; }
+          else { music.play(); btn.textContent = 'Music: On'; }
+        });
+      })();
+    </script>
+  </body>
+  </html>
 
 
-<section class="text-gray-700 body-font">
-  <div class="container mx-auto flex px-5 py-16 md:flex-row flex-col items-center">
-    <div class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
-      <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">Before they sold out
-        <br class="hidden lg:inline-block">readymade gluten
-      </h1>
-      <p class="mb-8 leading-relaxed">Copper mug try-hard pitchfork pour-over freegan heirloom neutra air plant cold-pressed tacos poke beard tote bag. Heirloom echo park mlkshk tote bag selvage hot chicken authentic tumeric truffaut hexagon try-hard chambray.</p>
-      <div class="flex justify-center">
-              <a href="c2.html" class="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">Read Case Study
-        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-          <path d="M5 12h14M12 5l7 7-7 7"></path>
-        </svg>
-      </a>
-      </div>
-    </div>
-    <div class="lg:max-w-lg lg:w-full md:w-1/2 w-5/6">
-      <img class="object-cover object-center rounded" alt="hero" src="images/p2.jpg">
-    </div>
-  </div>
-</section>
-
-
-
-<section class="text-gray-700 body-font">
-  <div class="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center">
-    <div class="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
-      <img class="object-cover object-center rounded" alt="hero" src="images/p3.jpg">
-    </div>
-    <div class="lg:flex-grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
-      <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">Before they sold out
-        <br class="hidden lg:inline-block">readymade gluten
-      </h1>
-      <p class="mb-8 leading-relaxed">Copper mug try-hard pitchfork pour-over freegan heirloom neutra air plant cold-pressed tacos poke beard tote bag. Heirloom echo park mlkshk tote bag selvage hot chicken authentic tumeric truffaut hexagon try-hard chambray.</p>
-      <div class="flex justify-center">
-      <a href="c1.html" class="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">Read Case Study
-        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-          <path d="M5 12h14M12 5l7 7-7 7"></path>
-        </svg>
-      </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-
-
-<footer class="text-gray-700 body-font">
-  <div class="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
-    <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-      <span class="ml-3 text-xl">TheSpeedyWolf</span>
-    </a>
-    <p class="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">© 2020 All rights reserved —
-      <a href="https://twitter.com/knyttneve" class="text-gray-600 ml-1" rel="noopener noreferrer" target="_blank">@Atish</a>
-    </p>
-    <span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
-      <a class="text-gray-500">
-        <svg fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
-          <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-        </svg>
-      </a>
-      <a class="ml-3 text-gray-500">
-        <svg fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
-          <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
-        </svg>
-      </a>
-      <a class="ml-3 text-gray-500">
-        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
-          <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-          <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
-        </svg>
-      </a>
-      <a class="ml-3 text-gray-500">
-        <svg fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0" class="w-5 h-5" viewBox="0 0 24 24">
-          <path stroke="none" d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
-          <circle cx="4" cy="4" r="2" stroke="none"></circle>
-        </svg>
-      </a>
-    </span>
-  </div>
-</footer>
-
-
-
-<style type="text/css">
-	a:hover {
- cursor:pointer;
-}
-</style>
-</body>
-</html>

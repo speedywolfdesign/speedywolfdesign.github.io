@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Snake</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">🐍</span>
+          <h1>NEON SNAKE</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="restartBtn" class="btn primary">New Game</button>
+        </div>
+      </header>
+
+      <main class="flappy-layout">
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <div class="flappy-frame glass">
+                    <canvas id="snakeCanvas" class="flappy-canvas" aria-label="Snake Game" role="img"></canvas>
+                    <div class="flappy-overlay">
+                      <div class="hud">
+                        <div class="hud-item"><span>Score:</span> <strong id="snakeScore">0</strong></div>
+                        <div class="hud-item"><span>Best:</span> <strong id="snakeBest">0</strong></div>
+                        <div class="hud-item"><span>Speed:</span> <strong id="snakeSpeed">1.0x</strong></div>
+                      </div>
+                      <div id="snakeHint" class="hint">Arrow keys to move. Eat food. Don't crash.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="gb-controls">
+                <div class="gb-dpad" aria-label="D-Pad Controls">
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="up" aria-label="Up">▲</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="left" aria-label="Left">◀</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="right" aria-label="Right">▶</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="down" aria-label="Down">▼</button>
+                  <div class="spacer"></div>
+                </div>
+                <div class="gb-ab">
+                  <button id="gbStartSnake" class="gb-key" aria-label="Start">A</button>
+                  <button id="gbPauseSnake" class="gb-key" aria-label="Pause">B</button>
+                </div>
+              </div>
+              <div class="gb-start-select">
+                <button class="btn">SELECT</button>
+                <button class="btn">START</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Grid-based neon snake • Vanilla JS</span>
+      </footer>
+    </div>
+
+    <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
+      <div class="content glass">
+        <h2 id="modalTitle">Game Over</h2>
+        <p id="modalText">You crashed.</p>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="modalRestart" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="snake.js"></script>
+  </body>
+  </html>
+
+

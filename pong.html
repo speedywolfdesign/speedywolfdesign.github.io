@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Pong</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">🏓</span>
+          <h1>NEON PONG</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="pongRestart" class="btn primary">Restart</button>
+        </div>
+      </header>
+
+      <main class="flappy-layout">
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <div class="flappy-frame glass">
+                    <canvas id="pongCanvas" class="flappy-canvas" aria-label="Pong" role="img"></canvas>
+                    <div class="flappy-overlay">
+                      <div class="hud">
+                        <div class="hud-item"><span>Left:</span> <strong id="pongLeft">0</strong></div>
+                        <div class="hud-item"><span>Right:</span> <strong id="pongRight">0</strong></div>
+                      </div>
+                      <div class="hint">W/S and Arrow Keys to move paddles</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="gb-controls">
+                <div class="gb-dpad" aria-label="D-Pad Controls">
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="up" aria-label="Up">▲</button>
+                  <div class="spacer"></div>
+                  <button id="pongLeftBtn" class="gb-key" aria-label="Left">◀</button>
+                  <div class="spacer"></div>
+                  <button id="pongRightBtn" class="gb-key" aria-label="Right">▶</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="down" aria-label="Down">▼</button>
+                  <div class="spacer"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Two Player • First to 7</span>
+      </footer>
+    </div>
+
+    <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
+      <div class="content glass">
+        <h2 id="modalTitle">Match Over</h2>
+        <p id="modalText"></p>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="modalRestart" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="pong.js"></script>
+  </body>
+  </html>
+
+
