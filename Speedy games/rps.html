@@ -24,19 +24,30 @@
       </header>
 
       <main class="rps-layout">
-        <section class="rps-card glass">
-          <div class="rps-play">
-            <div class="rps-emoji" id="rpsYouEmoji">❔</div>
-            <div class="rps-vs">vs</div>
-            <div class="rps-emoji" id="rpsCpuEmoji">❔</div>
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="rps-card glass" style="margin:0;">
+                    <div class="rps-play">
+                      <div class="rps-emoji" id="rpsYouEmoji">❔</div>
+                      <div class="rps-vs">vs</div>
+                      <div class="rps-emoji" id="rpsCpuEmoji">❔</div>
+                    </div>
+                    <div class="rps-buttons">
+                      <button class="btn" data-move="rock" aria-label="Rock">✊</button>
+                      <button class="btn" data-move="paper" aria-label="Paper">✋</button>
+                      <button class="btn" data-move="scissors" aria-label="Scissors">✌️</button>
+                    </div>
+                    <div class="rps-status" id="rpsStatus">Make your move</div>
+                    <div class="rps-scores">You: <strong id="rpsYou">0</strong> • CPU: <strong id="rpsCpu">0</strong></div>
+                  </section>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="rps-buttons">
-            <button class="btn" data-move="rock" aria-label="Rock">✊</button>
-            <button class="btn" data-move="paper" aria-label="Paper">✋</button>
-            <button class="btn" data-move="scissors" aria-label="Scissors">✌️</button>
-          </div>
-          <div class="rps-status" id="rpsStatus">Make your move</div>
-          <div class="rps-scores">You: <strong id="rpsYou">0</strong> • CPU: <strong id="rpsCpu">0</strong></div>
         </section>
       </main>
 

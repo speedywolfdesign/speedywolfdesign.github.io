@@ -9,6 +9,8 @@
   const modalTitle = document.getElementById("modalTitle");
   const modalText = document.getElementById("modalText");
   const modalRestart = document.getElementById("modalRestart");
+  const dpadButtons = Array.from(document.querySelectorAll('.gb-key[data-dir]'));
+  const gbStart = document.getElementById('gbStart2048');
 
   const size = 4;
   let grid, score, movedFlag;
@@ -93,6 +95,15 @@
     if (e.code === "ArrowRight") move(2);
     if (e.code === "ArrowDown") move(3);
   });
+  // D-pad touch controls
+  dpadButtons.forEach(btn => btn.addEventListener('pointerdown', () => {
+    const d = btn.getAttribute('data-dir');
+    if (d === 'left') move(0);
+    if (d === 'up') move(1);
+    if (d === 'right') move(2);
+    if (d === 'down') move(3);
+  }));
+  if (gbStart) gbStart.addEventListener('click', init);
 
   resetBtn.addEventListener("click", init);
   if (modalRestart) modalRestart.addEventListener("click", () => { modal.classList.add("hidden"); init(); });

@@ -24,13 +24,24 @@
       </header>
 
       <main class="memory-layout">
-        <section class="memory-card glass">
-          <div class="memory-stats">
-            <span>Moves:</span> <strong id="memMoves">0</strong>
-            <span style="margin-left:16px;">Points:</span> <strong id="memPoints">0</strong>
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="memory-card glass" style="margin:0;">
+                    <div class="memory-stats">
+                      <span>Moves:</span> <strong id="memMoves">0</strong>
+                      <span style="margin-left:16px;">Points:</span> <strong id="memPoints">0</strong>
+                    </div>
+                    <div id="memoryGrid" class="memory-grid"></div>
+                    <div id="memEffects" class="effect-layer" aria-hidden="true"></div>
+                  </section>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="memoryGrid" class="memory-grid"></div>
-          <div id="memEffects" class="effect-layer" aria-hidden="true"></div>
         </section>
       </main>
 

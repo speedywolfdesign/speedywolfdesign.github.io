@@ -25,15 +25,24 @@
 
       <main class="flappy-layout">
         <section class="flappy-wrapper">
-          <div class="flappy-frame glass">
-            <canvas id="flappyCanvas" class="flappy-canvas" aria-label="Flappy Bird Game" role="img"></canvas>
-            <div class="flappy-overlay">
-              <div id="flappyHUD" class="hud">
-                <div class="hud-item"><span>Score:</span> <strong id="scoreText">0</strong></div>
-                <div class="hud-item"><span>Best:</span> <strong id="bestText">0</strong></div>
-                <div class="hud-item"><span>Speed:</span> <strong id="speedText">1.0x</strong></div>
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <div class="flappy-frame glass">
+                    <canvas id="flappyCanvas" class="flappy-canvas" aria-label="Flappy Bird Game" role="img"></canvas>
+                    <div class="flappy-overlay">
+                      <div id="flappyHUD" class="hud">
+                        <div class="hud-item"><span>Score:</span> <strong id="scoreText">0</strong></div>
+                        <div class="hud-item"><span>Best:</span> <strong id="bestText">0</strong></div>
+                        <div class="hud-item"><span>Speed:</span> <strong id="speedText">1.0x</strong></div>
+                      </div>
+                      <div id="flappyHint" class="hint">Click / Tap / Space to flap</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div id="flappyHint" class="hint">Click / Tap / Space to flap</div>
             </div>
           </div>
         </section>

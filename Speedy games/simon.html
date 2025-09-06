@@ -25,18 +25,27 @@
 
       <main class="flappy-layout">
         <section class="flappy-wrapper">
-          <div class="flappy-frame glass" style="padding: 20px; min-width: 300px;">
-            <div class="simon-grid" style="justify-content: center;">
-              <button class="simon btn-red s0" aria-label="Top left"></button>
-              <button class="simon btn-blue s1" aria-label="Top right"></button>
-              <button class="simon btn-green s2" aria-label="Bottom left"></button>
-              <button class="simon btn-yellow s3" aria-label="Bottom right"></button>
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <div class="flappy-frame glass" style="padding: 20px; min-width: 300px; margin:0;">
+                    <div class="simon-grid" style="justify-content: center;">
+                      <button class="simon btn-red s0" aria-label="Top left"></button>
+                      <button class="simon btn-blue s1" aria-label="Top right"></button>
+                      <button class="simon btn-green s2" aria-label="Bottom left"></button>
+                      <button class="simon btn-yellow s3" aria-label="Bottom right"></button>
+                    </div>
+                    <div class="hud" style="margin-top: 16px; display: flex; justify-content: center; gap: 24px;">
+                      <div class="hud-item"><span>Status:</span> <strong id="simonStatus">Ready</strong></div>
+                      <div class="hud-item"><span>Score:</span> <strong id="simonScore">0</strong></div>
+                    </div>
+                    <div class="hint" id="simonHint" style="text-align:center; margin-top: 8px;">Click Start, then wait for the beat...</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="hud" style="margin-top: 16px; display: flex; justify-content: center; gap: 24px;">
-              <div class="hud-item"><span>Status:</span> <strong id="simonStatus">Ready</strong></div>
-              <div class="hud-item"><span>Score:</span> <strong id="simonScore">0</strong></div>
-            </div>
-            <div class="hint" id="simonHint" style="text-align:center; margin-top: 8px;">Click Start, then wait for the beat...</div>
           </div>
         </section>
       </main>

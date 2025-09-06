@@ -25,14 +25,29 @@
 
       <main class="flappy-layout">
         <section class="flappy-wrapper">
-          <div class="flappy-frame glass">
-            <canvas id="brCanvas" class="flappy-canvas" aria-label="Breakout" role="img"></canvas>
-            <div class="flappy-overlay">
-              <div class="hud">
-                <div class="hud-item"><span>Score:</span> <strong id="brScore">0</strong></div>
-                <div class="hud-item"><span>Lives:</span> <strong id="brLives">3</strong></div>
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <div class="flappy-frame glass">
+                    <canvas id="brCanvas" class="flappy-canvas" aria-label="Breakout" role="img"></canvas>
+                    <div class="flappy-overlay">
+                      <div class="hud">
+                        <div class="hud-item"><span>Score:</span> <strong id="brScore">0</strong></div>
+                        <div class="hud-item"><span>Lives:</span> <strong id="brLives">3</strong></div>
+                      </div>
+                      <div class="hint">Arrow keys to move</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="hint">Arrow keys to move</div>
+              <div class="gb-controls">
+                <div class="gb-ab">
+                  <button id="brLeft" class="gb-key" aria-label="Left">◀</button>
+                  <button id="brRight" class="gb-key" aria-label="Right">▶</button>
+                </div>
+              </div>
             </div>
           </div>
         </section>

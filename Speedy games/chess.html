@@ -30,28 +30,39 @@
       </header>
 
       <main class="layout">
-        <section class="board-wrapper">
-          <div class="stage-3d">
-            <div id="board3d" class="board-3d">
-              <div id="board" class="board" aria-label="Chess board" role="grid"></div>
-              <div id="boardOverlay" class="board-overlay" aria-hidden="true"></div>
-              <div id="effectLayer" class="effect-layer" aria-hidden="true"></div>
-              <div id="confettiLayer" class="effect-layer" aria-hidden="true"></div>
-            </div>
-          </div>
-          <div id="promotionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="promotionTitle">
-            <div class="modal-content glass">
-              <h2 id="promotionTitle">Promote Pawn</h2>
-              <div class="promo-choices">
-                <button data-piece="q" class="btn promo">Q</button>
-                <button data-piece="r" class="btn promo">R</button>
-                <button data-piece="b" class="btn promo">B</button>
-                <button data-piece="n" class="btn promo">N</button>
+        <section class="flappy-wrapper" style="width:100%;">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <div class="board-wrapper" style="margin:0;">
+                    <div class="stage-3d">
+                      <div id="board3d" class="board-3d">
+                        <div id="board" class="board" aria-label="Chess board" role="grid"></div>
+                        <div id="boardOverlay" class="board-overlay" aria-hidden="true"></div>
+                        <div id="effectLayer" class="effect-layer" aria-hidden="true"></div>
+                        <div id="confettiLayer" class="effect-layer" aria-hidden="true"></div>
+                      </div>
+                    </div>
+                    <div id="promotionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="promotionTitle">
+                      <div class="modal-content glass">
+                        <h2 id="promotionTitle">Promote Pawn</h2>
+                        <div class="promo-choices">
+                          <button data-piece="q" class="btn promo">Q</button>
+                          <button data-piece="r" class="btn promo">R</button>
+                          <button data-piece="b" class="btn promo">B</button>
+                          <button data-piece="n" class="btn promo">N</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
-
+        
         <aside class="sidebar glass">
           <div class="status">
             <div class="turn-indicator">
@@ -59,7 +70,7 @@
             </div>
             <div class="check-indicator" id="checkIndicator"></div>
           </div>
-
+          
           <div class="history">
             <h3>Moves</h3>
             <ol id="moveList" class="move-list"></ol>

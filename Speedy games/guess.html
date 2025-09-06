@@ -24,14 +24,25 @@
       </header>
 
       <main class="guess-layout">
-        <section class="guess-card glass">
-          <h2 class="guess-title">Pick 1–100</h2>
-          <div class="guess-controls">
-            <input id="guessInput" type="number" min="1" max="100" placeholder="Enter guess" />
-            <button id="guessBtn" class="btn">Guess</button>
-            <div style="align-self:center">Attempts: <strong id="attempts">0</strong></div>
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="guess-card glass" style="margin:0;">
+                    <h2 class="guess-title">Pick 1–100</h2>
+                    <div class="guess-controls">
+                      <input id="guessInput" type="number" min="1" max="100" placeholder="Enter guess" />
+                      <button id="guessBtn" class="btn">Guess</button>
+                      <div style="align-self:center">Attempts: <strong id="attempts">0</strong></div>
+                    </div>
+                    <div id="guessMsg" class="guess-msg">Make your first guess!</div>
+                  </section>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="guessMsg" class="guess-msg">Make your first guess!</div>
         </section>
       </main>
 

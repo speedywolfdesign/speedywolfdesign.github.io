@@ -218,6 +218,7 @@ body {
 .memory-card { width: min(760px, 94vw); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); }
 .memory-stats { text-align: center; margin-bottom: 10px; }
 .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.mem-card { width: 100%; }
 .mem-card { position: relative; perspective: 800px; border: none; background: transparent; padding: 0; }
 .mem-inner { position: relative; width: 100%; padding-top: 100%; transform-style: preserve-3d; transition: transform 420ms ease; }
 .mem-card.open .mem-inner { transform: rotateY(180deg); }
@@ -596,7 +597,9 @@ canvas { touch-action: none; }
   .flappy-canvas { height: 56vh; }
   .ttt-grid { grid-template-columns: repeat(3, 90px); grid-template-rows: repeat(3, 90px); }
   .ttt-cell { font-size: 46px; }
-  .memory-grid { grid-template-columns: repeat(3, 1fr); }
+  .memory-card { width: 100%; padding: 10px; }
+  .memory-grid { grid-template-columns: repeat(auto-fit, minmax(56px, 1fr)); gap: 8px; }
+  .mem-front, .mem-back { font-size: clamp(14px, 6vw, 28px); }
   .g2048-grid { gap: 8px; }
   .g2048-cell { height: 68px; }
   .rps-emoji { font-size: 56px; }
@@ -610,7 +613,74 @@ canvas { touch-action: none; }
   .ttt-grid { grid-template-columns: repeat(3, 82px); grid-template-rows: repeat(3, 82px); }
   .ttt-cell { font-size: 42px; }
   .g2048-cell { height: 60px; }
+  .memory-grid { grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 6px; }
+  .mem-front, .mem-back { font-size: clamp(12px, 5.2vw, 24px); }
   .uno-card { width: 46px; height: 68px; }
+}
+
+/* GameBoy-style shell (mobile only) without altering game colors */
+@media (max-width: 720px) {
+  .gb-shell { display: grid; place-items: center; margin-top: 12px; }
+  .gb-body {
+    width: min(94vw, 420px);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #d6d7d0, #c1c3bb);
+    border: 1px solid #8c8f87;
+    box-shadow: inset 0 2px 6px rgba(255,255,255,0.3), 0 20px 40px rgba(0,0,0,0.35);
+    padding: 14px 14px 18px 14px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    max-height: calc(100vh - 80px);
+  }
+  .gb-screen {
+    border-radius: 12px;
+    background: linear-gradient(180deg, #3e3f45, #2c2d30);
+    border: 1px solid #1f2023;
+    padding: 10px;
+    box-shadow: inset 0 4px 10px rgba(0,0,0,0.45);
+  }
+  .gb-screen-bezel {
+    height: 8px;
+    background: linear-gradient(90deg, #8b1a6b, #3d3d8f);
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 8px;
+  }
+  .gb-screen-window { border-radius: 8px; overflow: auto; height: clamp(220px, 52vh, 520px); }
+  .gb-screen-window > * { max-height: 100%; }
+  .gb-screen-window .flappy-frame { height: 100%; }
+  .gb-screen-window .flappy-canvas { height: 100% !important; max-height: 100%; }
+  .gb-screen-window .uno-stage,
+  .gb-screen-window .g2048-card,
+  .gb-screen-window .ttt-wrapper,
+  .gb-screen-window .memory-card,
+  .gb-screen-window .rps-card,
+  .gb-screen-window .hangman-card,
+  .gb-screen-window .flappy-frame { width: 100%; }
+
+  /* Controls */
+  .gb-controls { margin-top: 16px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .gb-dpad {
+    display: grid;
+    grid-template-columns: 48px 48px 48px;
+    grid-template-rows: 48px 48px 48px;
+    gap: 8px;
+    touch-action: manipulation;
+    justify-self: start;
+  }
+  .gb-dpad .spacer { visibility: hidden; }
+  .gb-key {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    border: 1px solid #6b6e67;
+    background: linear-gradient(180deg, #8e938b, #7d8179);
+    color: #101410;
+    font-weight: 800; font-family: "Orbitron", monospace;
+    display: grid; place-items: center;
+    box-shadow: inset 0 2px 6px rgba(255,255,255,0.25), 0 6px 12px rgba(0,0,0,0.25);
+  }
+  .gb-key:active { filter: brightness(0.95); transform: translateY(1px); }
+  .gb-ab { display: grid; grid-template-columns: repeat(2, 56px); gap: 12px; justify-self: end; }
+  .gb-start-select { margin-top: 12px; display: grid; grid-auto-flow: column; gap: 12px; justify-content: center; }
 }
 
 

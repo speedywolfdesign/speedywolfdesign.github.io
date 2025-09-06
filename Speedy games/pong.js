@@ -11,6 +11,8 @@
   const modalTitle = document.getElementById("modalTitle");
   const modalText = document.getElementById("modalText");
   const modalRestart = document.getElementById("modalRestart");
+  const leftBtn = document.getElementById("pongLeftBtn");
+  const rightBtn = document.getElementById("pongRightBtn");
 
   const DPR = Math.min(2, window.devicePixelRatio || 1);
   let vw = 0, vh = 0;
@@ -54,6 +56,16 @@
     if (e.code === "KeyW" || e.code === "KeyS") left.vy = 0;
     if (e.code === "ArrowUp" || e.code === "ArrowDown") right.vy = 0;
   });
+  if (leftBtn) {
+    leftBtn.addEventListener('pointerdown', () => { left.vy = -paddleSpeed; });
+    leftBtn.addEventListener('pointerup', () => { left.vy = 0; });
+    leftBtn.addEventListener('pointerleave', () => { if (left.vy < 0) left.vy = 0; });
+  }
+  if (rightBtn) {
+    rightBtn.addEventListener('pointerdown', () => { right.vy = paddleSpeed; });
+    rightBtn.addEventListener('pointerup', () => { right.vy = 0; });
+    rightBtn.addEventListener('pointerleave', () => { if (right.vy > 0) right.vy = 0; });
+  }
   restartBtn.addEventListener("click", () => { score.l = 0; score.r = 0; updateHUD(); if (modal) modal.classList.add("hidden"); resetBall(Math.random()<0.5); });
   if (modalRestart) modalRestart.addEventListener("click", () => { score.l = 0; score.r = 0; updateHUD(); modal.classList.add("hidden"); resetBall(Math.random()<0.5); });
   let music = null; let sfx = null; if (typeof createChiptune === 'function' && musicBtn) { music = createChiptune('pong'); sfx = createSFX(); musicBtn.addEventListener("click", () => { if (music.isPlaying()) { music.pause(); musicBtn.textContent = "Music: Off"; } else { music.play(); musicBtn.textContent = "Music: On"; } }); }

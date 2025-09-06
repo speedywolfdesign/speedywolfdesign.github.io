@@ -24,22 +24,33 @@
       </header>
 
       <main class="uno-layout">
-        <section class="uno-stage glass">
-          <div class="uno-hud">
-            <div><span>Turn:</span> <strong id="unoTurn">Player</strong></div>
-            <div><span>Direction:</span> <strong id="unoDir">↻</strong></div>
-          </div>
-          <div class="uno-center">
-            <div id="unoDiscard" class="uno-pile"></div>
-            <button id="unoDraw" class="btn">Draw</button>
-          </div>
-          <div class="uno-hand cpu">
-            <div class="uno-hand-title">CPU</div>
-            <div id="unoCpu" class="uno-cards"></div>
-          </div>
-          <div class="uno-hand player">
-            <div class="uno-hand-title">You</div>
-            <div id="unoPlayer" class="uno-cards"></div>
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="uno-stage glass" style="margin:0;">
+                    <div class="uno-hud">
+                      <div><span>Turn:</span> <strong id="unoTurn">Player</strong></div>
+                      <div><span>Direction:</span> <strong id="unoDir">↻</strong></div>
+                    </div>
+                    <div class="uno-center">
+                      <div id="unoDiscard" class="uno-pile"></div>
+                      <button id="unoDraw" class="btn">Draw</button>
+                    </div>
+                    <div class="uno-hand cpu">
+                      <div class="uno-hand-title">CPU</div>
+                      <div id="unoCpu" class="uno-cards"></div>
+                    </div>
+                    <div class="uno-hand player">
+                      <div class="uno-hand-title">You</div>
+                      <div id="unoPlayer" class="uno-cards"></div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>

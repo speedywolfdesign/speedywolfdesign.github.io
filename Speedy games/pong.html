@@ -25,14 +25,36 @@
 
       <main class="flappy-layout">
         <section class="flappy-wrapper">
-          <div class="flappy-frame glass">
-            <canvas id="pongCanvas" class="flappy-canvas" aria-label="Pong" role="img"></canvas>
-            <div class="flappy-overlay">
-              <div class="hud">
-                <div class="hud-item"><span>Left:</span> <strong id="pongLeft">0</strong></div>
-                <div class="hud-item"><span>Right:</span> <strong id="pongRight">0</strong></div>
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <div class="flappy-frame glass">
+                    <canvas id="pongCanvas" class="flappy-canvas" aria-label="Pong" role="img"></canvas>
+                    <div class="flappy-overlay">
+                      <div class="hud">
+                        <div class="hud-item"><span>Left:</span> <strong id="pongLeft">0</strong></div>
+                        <div class="hud-item"><span>Right:</span> <strong id="pongRight">0</strong></div>
+                      </div>
+                      <div class="hint">W/S and Arrow Keys to move paddles</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="hint">W/S and Arrow Keys to move paddles</div>
+              <div class="gb-controls">
+                <div class="gb-dpad" aria-label="D-Pad Controls">
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="up" aria-label="Up">▲</button>
+                  <div class="spacer"></div>
+                  <button id="pongLeftBtn" class="gb-key" aria-label="Left">◀</button>
+                  <div class="spacer"></div>
+                  <button id="pongRightBtn" class="gb-key" aria-label="Right">▶</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="down" aria-label="Down">▼</button>
+                  <div class="spacer"></div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

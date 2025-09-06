@@ -24,9 +24,37 @@
       </header>
 
       <main class="g2048-layout">
-        <section class="g2048-card glass">
-          <div class="g2048-hud">Score: <strong id="g2048Score">0</strong></div>
-          <div id="g2048Grid" class="g2048-grid" aria-label="2048 grid"></div>
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="g2048-card glass" style="margin:0;">
+                    <div class="g2048-hud">Score: <strong id="g2048Score">0</strong></div>
+                    <div id="g2048Grid" class="g2048-grid" aria-label="2048 grid"></div>
+                  </section>
+                </div>
+              </div>
+              <div class="gb-controls">
+                <div class="gb-dpad" aria-label="D-Pad Controls">
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="up" aria-label="Up">▲</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="left" aria-label="Left">◀</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="right" aria-label="Right">▶</button>
+                  <div class="spacer"></div>
+                  <button class="gb-key" data-dir="down" aria-label="Down">▼</button>
+                  <div class="spacer"></div>
+                </div>
+                <div class="gb-ab">
+                  <button id="gbStart2048" class="gb-key" aria-label="Restart">A</button>
+                  <button class="gb-key" aria-label="Unused">B</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 

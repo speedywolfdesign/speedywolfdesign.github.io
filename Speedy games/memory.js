@@ -28,6 +28,7 @@
       el.addEventListener("click", () => flip(card, el));
       const inner = document.createElement("div");
       inner.className = "mem-inner";
+      inner.style.maxWidth = '100%';
       const front = document.createElement("div"); front.className = "mem-front"; front.textContent = card.icon;
       const back = document.createElement("div"); back.className = "mem-back"; back.textContent = "✦";
       inner.appendChild(front); inner.appendChild(back); el.appendChild(inner);

@@ -10,6 +10,9 @@
   const musicBtn = document.getElementById("musicBtn");
   const modal = document.getElementById("gameModal");
   const modalRestart = document.getElementById("modalRestart");
+  const dpadButtons = Array.from(document.querySelectorAll('.gb-key[data-dir]'));
+  const gbStart = document.getElementById('gbStartSnake');
+  const gbPause = document.getElementById('gbPauseSnake');
 
   const ctx = canvas.getContext("2d");
   const DPR = Math.min(2, window.devicePixelRatio || 1);
@@ -28,6 +31,7 @@
   resize();
 
   let snake, dir, pendingDir, food, score, best, speedScale, tickMs, accMs, alive;
+  let paused = false;
 
   function reset() {
     snake = [ {x: Math.floor(cols/2), y: Math.floor(rows/2)} ];
@@ -61,6 +65,16 @@
     else if (e.code === "ArrowLeft" && dir.x !== 1) pendingDir = {x:-1, y:0};
     else if (e.code === "ArrowRight" && dir.x !== -1) pendingDir = {x:1, y:0};
   });
+  // D-pad (touch)
+  dpadButtons.forEach(btn => btn.addEventListener('pointerdown', (e) => {
+    const d = btn.getAttribute('data-dir');
+    if (d === 'up' && dir.y !== 1) pendingDir = {x:0, y:-1};
+    if (d === 'down' && dir.y !== -1) pendingDir = {x:0, y:1};
+    if (d === 'left' && dir.x !== 1) pendingDir = {x:-1, y:0};
+    if (d === 'right' && dir.x !== -1) pendingDir = {x:1, y:0};
+  }));
+  if (gbStart) gbStart.addEventListener('click', () => { if (!alive) reset(); else paused = false; });
+  if (gbPause) gbPause.addEventListener('click', () => { paused = !paused; });
   restartBtn.addEventListener("click", reset);
   if (modalRestart) modalRestart.addEventListener("click", () => { modal.classList.add("hidden"); reset(); });
   let music = null; let sfx = null; if (typeof createChiptune === 'function' && musicBtn) {
@@ -71,7 +85,7 @@
   function loop(ts) {
     const dt = Math.min(0.05, (ts - last) / 1000);
     last = ts;
-    if (alive) {
+    if (alive && !paused) {
       accMs += dt * 1000;
       while (accMs >= tickMs) {
         accMs -= tickMs;

@@ -11,6 +11,8 @@
   const modalTitle = document.getElementById("modalTitle");
   const modalText = document.getElementById("modalText");
   const modalRestart = document.getElementById("modalRestart");
+  const leftBtn = document.getElementById("brLeft");
+  const rightBtn = document.getElementById("brRight");
 
   const DPR = Math.min(2, window.devicePixelRatio || 1);
   let vw = 0, vh = 0;
@@ -57,6 +59,16 @@
 
   window.addEventListener("keydown", (e) => { if (e.code === "ArrowLeft") paddle.vx = -paddle.speed; if (e.code === "ArrowRight") paddle.vx = paddle.speed; });
   window.addEventListener("keyup", (e) => { if (e.code === "ArrowLeft" && paddle.vx < 0) paddle.vx = 0; if (e.code === "ArrowRight" && paddle.vx > 0) paddle.vx = 0; });
+  if (leftBtn) {
+    leftBtn.addEventListener('pointerdown', () => { paddle.vx = -paddle.speed; });
+    leftBtn.addEventListener('pointerup', () => { if (paddle.vx < 0) paddle.vx = 0; });
+    leftBtn.addEventListener('pointerleave', () => { if (paddle.vx < 0) paddle.vx = 0; });
+  }
+  if (rightBtn) {
+    rightBtn.addEventListener('pointerdown', () => { paddle.vx = paddle.speed; });
+    rightBtn.addEventListener('pointerup', () => { if (paddle.vx > 0) paddle.vx = 0; });
+    rightBtn.addEventListener('pointerleave', () => { if (paddle.vx > 0) paddle.vx = 0; });
+  }
   resetBtn.addEventListener("click", layout);
   if (modalRestart) modalRestart.addEventListener("click", () => { modal.classList.add("hidden"); layout(); });
   let music = null; let sfx = null; if (typeof createChiptune === 'function' && musicBtn) { music = createChiptune('breakout'); sfx = createSFX(); musicBtn.addEventListener("click", () => { if (music.isPlaying()) { music.pause(); musicBtn.textContent = "Music: Off"; } else { music.play(); musicBtn.textContent = "Music: On"; } }); }
