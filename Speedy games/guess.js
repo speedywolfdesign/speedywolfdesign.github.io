@@ -13,6 +13,7 @@
   const attemptsEl = document.getElementById("attempts");
 
   let target, attempts;
+  let sfx = (typeof createSFX === 'function') ? createSFX() : null;
 
   function reset() {
     target = 1 + Math.floor(Math.random() * 100);
@@ -29,11 +30,12 @@
     attempts += 1; attemptsEl.textContent = String(attempts);
     if (v === target) {
       msg.textContent = `Correct! The number was ${target}. Attempts: ${attempts}.`;
+      if (sfx) sfx.playWin();
       if (modal) { modalTitle.textContent = "You got it!"; modalText.textContent = `Attempts: ${attempts}`; modal.classList.remove("hidden"); }
     } else if (v < target) {
-      msg.textContent = "Too Low";
+      msg.textContent = "Too Low"; if (sfx) sfx.playClick();
     } else {
-      msg.textContent = "Too High";
+      msg.textContent = "Too High"; if (sfx) sfx.playClick();
     }
     input.select();
   }

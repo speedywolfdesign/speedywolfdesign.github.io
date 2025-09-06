@@ -12,6 +12,7 @@
   const modalTitle = document.getElementById("modalTitle");
   const modalText = document.getElementById("modalText");
   const modalRestart = document.getElementById("modalRestart");
+  const musicBtn = document.getElementById("musicBtn");
 
   const colors = ["red", "green", "blue", "yellow"]; // Wild has no color
   const numbers = [0,1,2,3,4,5,6,7,8,9];
@@ -103,7 +104,7 @@
     };
     el.appendChild(img);
     if (clickable) {
-      el.addEventListener('click', () => playPlayer(c));
+      el.addEventListener('click', () => { if (sfx) sfx.playClick(); playPlayer(c); });
     }
     return el;
   }
@@ -142,6 +143,7 @@
   function playPlayer(c) {
     if (!isPlayerTurn) return;
     if (!canPlay(c, discardTop)) return;
+    if (sfx) sfx.playHit();
     // Remove from hand
     const idx = playerHand.indexOf(c);
     if (idx >= 0) playerHand.splice(idx,1);
@@ -186,6 +188,7 @@
 
   function applyEffect(c, who) {
     if (typeof c.value === 'number') return;
+    if (sfx) sfx.playHit();
     if (c.value === 'reverse') { dir *= -1; updateDir(); return; }
     if (c.value === 'skip') { isPlayerTurn = (who === 'player'); return; }
     if (c.value === 'draw2') {
@@ -201,13 +204,28 @@
 
   unoDraw.addEventListener('click', () => {
     if (!isPlayerTurn) return;
+    if (sfx) sfx.playClick();
     playerHand.push(draw(1)[0]);
     render();
   });
 
-  unoNew.addEventListener('click', start);
+  unoNew.addEventListener('click', () => { if (sfx) sfx.playClick(); start(); });
   if (modalRestart) modalRestart.addEventListener('click', () => { modal.classList.add('hidden'); start(); });
-  function end(msg) { modalTitle.textContent = 'Game Over'; modalText.textContent = msg; modal.classList.remove('hidden'); }
+  function end(msg) {
+    modalTitle.textContent = 'Game Over'; modalText.textContent = msg; modal.classList.remove('hidden');
+    if (!sfx) return;
+    if (/you win/i.test(msg)) sfx.playWin(); else sfx.playLose();
+  }
+
+  // Music + SFX
+  let music = null; let sfx = null;
+  if (typeof createChiptune === 'function') {
+    sfx = createSFX();
+    if (musicBtn) {
+      music = createChiptune('uno');
+      musicBtn.addEventListener('click', () => { if (music.isPlaying()) { music.pause(); musicBtn.textContent = 'Music: Off'; } else { music.play(); musicBtn.textContent = 'Music: On'; } });
+    }
+  }
 
   start();
 })();

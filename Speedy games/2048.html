@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon UNO</title>
+    <title>Neon 2048</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -13,39 +13,25 @@
     <div id="app">
       <header class="app-header">
         <div class="brand">
-          <span class="logo">🃏</span>
-          <h1>NEON UNO</h1>
+          <span class="logo">🔲</span>
+          <h1>NEON 2048</h1>
         </div>
         <div class="header-actions">
           <a class="btn" href="index.html">Home</a>
           <button id="musicBtn" class="btn">Music: Off</button>
-          <button id="unoNew" class="btn primary">New Game</button>
+          <button id="g2048Reset" class="btn primary">New Game</button>
         </div>
       </header>
 
-      <main class="uno-layout">
-        <section class="uno-stage glass">
-          <div class="uno-hud">
-            <div><span>Turn:</span> <strong id="unoTurn">Player</strong></div>
-            <div><span>Direction:</span> <strong id="unoDir">↻</strong></div>
-          </div>
-          <div class="uno-center">
-            <div id="unoDiscard" class="uno-pile"></div>
-            <button id="unoDraw" class="btn">Draw</button>
-          </div>
-          <div class="uno-hand cpu">
-            <div class="uno-hand-title">CPU</div>
-            <div id="unoCpu" class="uno-cards"></div>
-          </div>
-          <div class="uno-hand player">
-            <div class="uno-hand-title">You</div>
-            <div id="unoPlayer" class="uno-cards"></div>
-          </div>
+      <main class="g2048-layout">
+        <section class="g2048-card glass">
+          <div class="g2048-hud">Score: <strong id="g2048Score">0</strong></div>
+          <div id="g2048Grid" class="g2048-grid" aria-label="2048 grid"></div>
         </section>
       </main>
 
       <footer class="app-footer">
-        <span>Match color or number • Special cards included</span>
+        <span>Merge tiles to 2048 • Arrow keys</span>
       </footer>
     </div>
 
@@ -59,10 +45,10 @@
         </div>
       </div>
     </div>
+
     <script src="audio.js"></script>
-    <script src="uno.js"></script>
+    <script src="g2048.js"></script>
   </body>
   </html>
-
 
 

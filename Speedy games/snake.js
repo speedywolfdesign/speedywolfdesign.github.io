@@ -91,7 +91,7 @@
     if (snake.some(s => s.x === head.x && s.y === head.y)) { if (sfx) sfx.playCrash(); gameOver(); return; }
     snake.unshift(head);
     if (head.x === food.x && head.y === food.y) {
-      score += 1; updateHUD(); spawnFood();
+      score += 1; if (sfx) sfx.playCoin(); updateHUD(); spawnFood();
       if (score % 10 === 0) { speedScale = Math.min(3.0, speedScale + 0.2); tickMs = Math.max(70, tickMs - 12); }
     } else {
       snake.pop();
@@ -102,6 +102,7 @@
     alive = false;
     hintEl.textContent = "Game Over — Press Space/Enter or click New Game";
     if (modal) modal.classList.remove("hidden");
+    if (sfx) sfx.playLose();
   }
 
   function drawGrid() {

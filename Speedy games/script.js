@@ -453,6 +453,18 @@ class ChessUI {
     this.renderBoardStructure();
     this.renderPosition();
     this.playIntro();
+
+    // Audio
+    this.sfx = (typeof createSFX === 'function') ? createSFX() : null;
+    this.musicBtn = document.getElementById("musicBtn");
+    this.music = (typeof createChiptune === 'function') ? createChiptune('chess') : null;
+    if (this.music && this.musicBtn) {
+      this.musicBtn.addEventListener('click', () => {
+        if (this.music.isPlaying()) { this.music.pause(); this.musicBtn.textContent = 'Music: Off'; }
+        else { this.music.play(); this.musicBtn.textContent = 'Music: On'; }
+      });
+    }
+    this.lastStatusType = null;
   }
 
   bindControls() {
@@ -601,6 +613,11 @@ class ChessUI {
     const status = this.engine.status();
     this.turnBadge.textContent = this.engine.activeColor === "w" ? "White to move" : "Black to move";
     this.checkIndicator.textContent = status.type === "check" ? "Check!" : status.type === "checkmate" ? "Checkmate" : status.type === "stalemate" ? "Stalemate" : "";
+    if (this.sfx && status.type !== this.lastStatusType) {
+      if (status.type === 'checkmate') this.sfx.playWin();
+      else if (status.type === 'stalemate') this.sfx.playLose();
+      this.lastStatusType = status.type;
+    }
   }
 
   onSquareClick(square) {
@@ -665,7 +682,7 @@ class ChessUI {
     this.selectedSquare = null;
     this.clearHighlights();
     this.renderPosition();
-    if (captureSquare) this.spawnCaptureEffectsAt(captureSquare);
+    if (captureSquare) { this.spawnCaptureEffectsAt(captureSquare); if (this.sfx) this.sfx.playHit(); }
   }
 
   getCaptureSquare(move) {

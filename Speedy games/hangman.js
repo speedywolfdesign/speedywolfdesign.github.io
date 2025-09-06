@@ -28,6 +28,7 @@
   const modalRestart = document.getElementById("modalRestart");
 
   let target, masked, wrong, used, over;
+  let sfx = (typeof createSFX === 'function') ? createSFX() : null;
 
   function newWord() {
     const pick = WORDS[Math.floor(Math.random() * WORDS.length)];
@@ -82,10 +83,10 @@
     for (let i = 0; i < target.length; i++) {
       if (target[i] === ch) { masked[i] = ch; hit = true; }
     }
-    if (!hit) wrong += 1;
+    if (!hit) { wrong += 1; if (sfx) sfx.playCrash(); }
     drawGallows();
-    if (masked.join("") === target) { over = true; msgEl.textContent = "You win!"; if (modal) { modalTitle.textContent = "You win!"; modalText.textContent = `Word: ${target}`; modal.classList.remove("hidden"); } }
-    else if (wrong >= 6) { over = true; msgEl.textContent = `Game Over — Word: ${target}`; if (modal) { modalTitle.textContent = "Game Over"; modalText.textContent = `Word: ${target}`; modal.classList.remove("hidden"); } }
+    if (masked.join("") === target) { over = true; msgEl.textContent = "You win!"; if (sfx) sfx.playWin(); if (modal) { modalTitle.textContent = "You win!"; modalText.textContent = `Word: ${target}`; modal.classList.remove("hidden"); } }
+    else if (wrong >= 6) { over = true; msgEl.textContent = `Game Over — Word: ${target}`; if (sfx) sfx.playLose(); if (modal) { modalTitle.textContent = "Game Over"; modalText.textContent = `Word: ${target}`; modal.classList.remove("hidden"); } }
     updateUI();
   }
 

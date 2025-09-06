@@ -12,6 +12,7 @@
 
   const size = 4;
   let grid, score, movedFlag;
+  let sfx = (typeof createSFX === 'function') ? createSFX() : null;
 
   function init() {
     grid = Array.from({ length: size }, () => Array(size).fill(0));
@@ -56,7 +57,7 @@
     for (let r = 0; r < size; r++) {
       const row = grid[r].filter(v => v !== 0);
       for (let c = 0; c < row.length - 1; c++) {
-        if (row[c] === row[c+1]) { row[c] *= 2; score += row[c]; row.splice(c+1, 1); }
+        if (row[c] === row[c+1]) { row[c] *= 2; score += row[c]; row.splice(c+1, 1); if (sfx) sfx.playCoin(); }
       }
       const newRow = [...row, ...Array(size - row.length).fill(0)];
       if (grid[r].join(',') !== newRow.join(',')) movedFlag = true;
@@ -83,7 +84,7 @@
       if (c+1 < size && grid[r][c+1] === v) return;
     }
     // Game over
-    if (modal) { modalTitle.textContent = "Game Over"; modalText.textContent = `Score: ${score}`; modal.classList.remove("hidden"); }
+    if (modal) { modalTitle.textContent = "Game Over"; modalText.textContent = `Score: ${score}`; modal.classList.remove("hidden"); if (sfx) sfx.playLose(); }
   }
 
   window.addEventListener("keydown", (e) => {

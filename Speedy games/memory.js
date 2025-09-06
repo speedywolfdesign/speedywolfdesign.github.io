@@ -14,6 +14,7 @@
   const pointsEl = document.getElementById("memPoints");
 
   let deck, first, second, lock, matches, moves, points;
+  let sfx = (typeof createSFX === 'function') ? createSFX() : null;
   const PREVIEW_MS = 3000;
 
   function reset() {
@@ -49,10 +50,11 @@
       first.card.matched = second.card.matched = true; matches += 1; lock = false; first = second = null;
       // Award points and celebrate
       points += 10; if (pointsEl) pointsEl.textContent = String(points);
+      if (sfx) sfx.playCoin();
       celebrateMatch();
-      if (matches === icons.length && modal) { modalTitle.textContent = "Completed"; modalText.textContent = `Moves: ${moves}`; modal.classList.remove("hidden"); }
+      if (matches === icons.length && modal) { modalTitle.textContent = "Completed"; modalText.textContent = `Moves: ${moves}`; modal.classList.remove("hidden"); if (sfx) sfx.playWin(); }
     } else {
-      setTimeout(() => { first.el.classList.remove("open"); second.el.classList.remove("open"); first = second = null; lock = false; }, 700);
+      setTimeout(() => { first.el.classList.remove("open"); second.el.classList.remove("open"); first = second = null; lock = false; if (sfx) sfx.playCrash(); }, 700);
     }
   }
 

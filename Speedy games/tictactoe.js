@@ -11,6 +11,7 @@
   const modalRestart = document.getElementById("modalRestart");
 
   let board, turn, over;
+  let sfx = (typeof createSFX === 'function') ? createSFX() : null;
 
   function init() {
     board = Array(9).fill(0); // 0 empty, 1 X, 2 O
@@ -30,6 +31,7 @@
   function onClick(i) {
     if (over || board[i] !== 0) return;
     board[i] = turn;
+    if (sfx) sfx.playClick();
     render();
     const w = winner();
     if (w) { end(w); return; }
@@ -54,6 +56,7 @@
     over = true;
     if (win === 0) {
       statusEl.textContent = "Draw!";
+      if (sfx) sfx.playCrash();
       if (modal) { modalTitle.textContent = "Draw"; modalText.textContent = "No winner this time."; modal.classList.remove("hidden"); }
     } else {
       statusEl.textContent = (win.player === 1 ? "X" : "O") + " wins!";
@@ -61,6 +64,7 @@
         const cell = boardEl.children[idx];
         cell.classList.add("win");
       }
+      if (sfx) sfx.playWin();
       if (modal) { modalTitle.textContent = "Game Over"; modalText.textContent = (win.player === 1 ? "X" : "O") + " wins!"; modal.classList.remove("hidden"); }
     }
   }

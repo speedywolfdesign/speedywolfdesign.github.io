@@ -15,6 +15,7 @@
   const cpuEmoji = document.getElementById("rpsCpuEmoji");
 
   let you = 0, cpu = 0, over = false;
+  let sfx = (typeof createSFX === 'function') ? createSFX() : null;
 
   function reset() { you = 0; cpu = 0; over = false; statusEl.textContent = "Make your move"; update(); }
   function update() { youEl.textContent = String(you); cpuEl.textContent = String(cpu); }
@@ -27,11 +28,11 @@
     const draw = move === c;
     if (youEmoji) youEmoji.textContent = mapEmoji[move];
     if (cpuEmoji) cpuEmoji.textContent = mapEmoji[c];
-    if (draw) statusEl.textContent = `Draw — You ${mapEmoji[move]} vs CPU ${mapEmoji[c]}`;
-    else if (win) { you += 1; statusEl.textContent = `You win — You ${mapEmoji[move]} vs CPU ${mapEmoji[c]}`; }
-    else { cpu += 1; statusEl.textContent = `You lose — You ${mapEmoji[move]} vs CPU ${mapEmoji[c]}`; }
+    if (draw) { statusEl.textContent = `Draw — You ${mapEmoji[move]} vs CPU ${mapEmoji[c]}`; if (sfx) sfx.playClick(); }
+    else if (win) { you += 1; statusEl.textContent = `You win — You ${mapEmoji[move]} vs CPU ${mapEmoji[c]}`; if (sfx) sfx.playHit(); }
+    else { cpu += 1; statusEl.textContent = `You lose — You ${mapEmoji[move]} vs CPU ${mapEmoji[c]}`; if (sfx) sfx.playCrash(); }
     update();
-    if (you >= 5 || cpu >= 5) { over = true; const msg = you > cpu ? "You win the match!" : "CPU wins the match!"; statusEl.textContent += " — " + msg; if (modal) { modalTitle.textContent = "Match Over"; modalText.textContent = msg; modal.classList.remove("hidden"); } }
+    if (you >= 5 || cpu >= 5) { over = true; const msg = you > cpu ? "You win the match!" : "CPU wins the match!"; statusEl.textContent += " — " + msg; if (sfx) { if (you > cpu) sfx.playWin(); else sfx.playLose(); } if (modal) { modalTitle.textContent = "Match Over"; modalText.textContent = msg; modal.classList.remove("hidden"); } }
   }
 
   buttons.forEach(b => b.addEventListener("click", () => play(b.getAttribute("data-move"))));

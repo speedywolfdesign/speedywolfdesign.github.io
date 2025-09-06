@@ -29,6 +29,9 @@
   const ball = { x: 0, y: 0, r: 9, vx: 260, vy: -260 };
   let bricks = [], cols = 10, rows = 6, brickW = 64, brickH = 22, brickGap = 6;
   let score = 0, lives = 3, running = true;
+  // Bounce visual pulses
+  let ballBounce = 0; // seconds remaining for ball squash effect
+  let paddleBounce = 0; // seconds remaining for paddle squash effect
 
   function layout() {
     paddle.x = (vw - paddle.w)/2; paddle.y = vh - 30;
@@ -59,16 +62,20 @@
   let music = null; let sfx = null; if (typeof createChiptune === 'function' && musicBtn) { music = createChiptune('breakout'); sfx = createSFX(); musicBtn.addEventListener("click", () => { if (music.isPlaying()) { music.pause(); musicBtn.textContent = "Music: Off"; } else { music.play(); musicBtn.textContent = "Music: On"; } }); }
 
   function step(dt) {
+    // decay bounce timers
+    if (ballBounce > 0) ballBounce = Math.max(0, ballBounce - dt);
+    if (paddleBounce > 0) paddleBounce = Math.max(0, paddleBounce - dt);
     paddle.x += paddle.vx * dt; paddle.x = Math.max(0, Math.min(vw - paddle.w, paddle.x));
     ball.x += ball.vx * dt; ball.y += ball.vy * dt;
-    if (ball.x - ball.r < 0) { ball.x = ball.r; ball.vx *= -1; }
-    if (ball.x + ball.r > vw) { ball.x = vw - ball.r; ball.vx *= -1; }
-    if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy *= -1; }
+    if (ball.x - ball.r < 0) { ball.x = ball.r; ball.vx *= -1; ballBounce = 0.12; if (sfx) sfx.playBounce(); }
+    if (ball.x + ball.r > vw) { ball.x = vw - ball.r; ball.vx *= -1; ballBounce = 0.12; if (sfx) sfx.playBounce(); }
+    if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy *= -1; ballBounce = 0.12; if (sfx) sfx.playBounce(); }
     // Paddle collision
     if (ball.y + ball.r > paddle.y && ball.y - ball.r < paddle.y + paddle.h && ball.x > paddle.x && ball.x < paddle.x + paddle.w && ball.vy > 0) {
       ball.y = paddle.y - ball.r; ball.vy *= -1;
       const rel = (ball.x - (paddle.x + paddle.w/2)) / (paddle.w/2);
       ball.vx = 260 * rel;
+      ballBounce = 0.16; paddleBounce = 0.12;
     }
     // Brick collisions
     for (const b of bricks) {
@@ -79,12 +86,13 @@
         const overlapX = Math.min(ball.x + ball.r - b.x, b.x + b.w - (ball.x - ball.r));
         const overlapY = Math.min(ball.y + ball.r - b.y, b.y + b.h - (ball.y - ball.r));
         if (overlapX < overlapY) ball.vx *= -1; else ball.vy *= -1;
+        ballBounce = 0.12;
         break;
       }
     }
     if (ball.y - ball.r > vh) {
-      lives -= 1; updateHUD();
-      if (lives <= 0) { if (modal) { modalTitle.textContent = "Game Over"; modalText.textContent = `Score: ${score}`; modal.classList.remove("hidden"); } layout(); return; }
+      lives -= 1; updateHUD(); if (sfx) sfx.playCrash();
+      if (lives <= 0) { if (modal) { modalTitle.textContent = "Game Over"; modalText.textContent = `Score: ${score}`; modal.classList.remove("hidden"); } if (sfx) sfx.playLose(); layout(); return; }
       ball.x = vw/2; ball.y = vh - 60; ball.vx = 240 * (Math.random() < 0.5 ? -1 : 1); ball.vy = -240;
     }
   }
@@ -93,9 +101,30 @@
     ctx.fillStyle = "rgba(10, 15, 31, 1)"; ctx.fillRect(0, 0, vw, vh);
     // paddle
     ctx.fillStyle = "#00f5ff"; ctx.shadowColor = "rgba(0,245,255,0.6)"; ctx.shadowBlur = 12;
-    ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h); ctx.shadowBlur = 0;
+    if (paddleBounce > 0) {
+      const n = Math.min(1, paddleBounce / 0.12);
+      const sx = 1 + 0.08 * n; const sy = 1 - 0.12 * n;
+      ctx.save();
+      ctx.translate(paddle.x + paddle.w/2, paddle.y + paddle.h/2);
+      ctx.scale(sx, sy);
+      ctx.fillRect(-paddle.w/2, -paddle.h/2, paddle.w, paddle.h);
+      ctx.restore();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h); ctx.shadowBlur = 0;
+    }
     // ball
-    ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.closePath(); ctx.fillStyle = "#fff"; ctx.fill();
+    if (ballBounce > 0) {
+      const n = Math.min(1, ballBounce / 0.16);
+      const sx = 1 + 0.25 * n; const sy = 1 - 0.2 * n;
+      ctx.save();
+      ctx.translate(ball.x, ball.y);
+      ctx.scale(sx, sy);
+      ctx.beginPath(); ctx.arc(0, 0, ball.r, 0, Math.PI*2); ctx.closePath(); ctx.fillStyle = "#fff"; ctx.fill();
+      ctx.restore();
+    } else {
+      ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.closePath(); ctx.fillStyle = "#fff"; ctx.fill();
+    }
     // bricks
     for (const b of bricks) {
       if (!b.alive) continue; ctx.fillStyle = "#152456"; ctx.fillRect(b.x, b.y, b.w, b.h);

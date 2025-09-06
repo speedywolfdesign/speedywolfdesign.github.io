@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon UNO</title>
+    <title>Guess the Number</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -13,45 +13,36 @@
     <div id="app">
       <header class="app-header">
         <div class="brand">
-          <span class="logo">🃏</span>
-          <h1>NEON UNO</h1>
+          <span class="logo">🔢</span>
+          <h1>GUESS THE NUMBER</h1>
         </div>
         <div class="header-actions">
           <a class="btn" href="index.html">Home</a>
           <button id="musicBtn" class="btn">Music: Off</button>
-          <button id="unoNew" class="btn primary">New Game</button>
+          <button id="resetGuess" class="btn primary">New Game</button>
         </div>
       </header>
 
-      <main class="uno-layout">
-        <section class="uno-stage glass">
-          <div class="uno-hud">
-            <div><span>Turn:</span> <strong id="unoTurn">Player</strong></div>
-            <div><span>Direction:</span> <strong id="unoDir">↻</strong></div>
+      <main class="guess-layout">
+        <section class="guess-card glass">
+          <h2 class="guess-title">Pick 1–100</h2>
+          <div class="guess-controls">
+            <input id="guessInput" type="number" min="1" max="100" placeholder="Enter guess" />
+            <button id="guessBtn" class="btn">Guess</button>
+            <div style="align-self:center">Attempts: <strong id="attempts">0</strong></div>
           </div>
-          <div class="uno-center">
-            <div id="unoDiscard" class="uno-pile"></div>
-            <button id="unoDraw" class="btn">Draw</button>
-          </div>
-          <div class="uno-hand cpu">
-            <div class="uno-hand-title">CPU</div>
-            <div id="unoCpu" class="uno-cards"></div>
-          </div>
-          <div class="uno-hand player">
-            <div class="uno-hand-title">You</div>
-            <div id="unoPlayer" class="uno-cards"></div>
-          </div>
+          <div id="guessMsg" class="guess-msg">Make your first guess!</div>
         </section>
       </main>
 
       <footer class="app-footer">
-        <span>Match color or number • Special cards included</span>
+        <span>Simple guessing game • Try to beat your best</span>
       </footer>
     </div>
 
     <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
       <div class="content glass">
-        <h2 id="modalTitle">Game Over</h2>
+        <h2 id="modalTitle">You got it!</h2>
         <p id="modalText"></p>
         <div class="actions">
           <a class="btn" href="index.html">Home</a>
@@ -59,10 +50,10 @@
         </div>
       </div>
     </div>
+
     <script src="audio.js"></script>
-    <script src="uno.js"></script>
+    <script src="guess.js"></script>
   </body>
   </html>
-
 
 

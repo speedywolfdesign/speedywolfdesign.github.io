@@ -118,7 +118,7 @@
       // Scoring when passing fully
       if (!p.scored && p.x + p.width < bird.x - bird.r) {
         p.scored = true;
-        score += 1;
+        score += 1; if (sfx) sfx.playCoin();
         passesSinceSpeedUp += 1;
         if (passesSinceSpeedUp % 10 === 0) {
           speedScale = Math.min(3.0, speedScale + 0.2);
@@ -209,6 +209,7 @@
       hint.textContent = "Game Over — Click / Tap / Space to restart";
       hint.style.opacity = 0.95;
       if (modal) modal.classList.remove("hidden");
+      if (sfx) sfx.playLose();
       return;
     }
     requestAnimationFrame(loop);
