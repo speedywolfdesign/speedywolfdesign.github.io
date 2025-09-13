@@ -49,12 +49,33 @@ body {
   background: linear-gradient(to right, rgba(0,0,0,0), rgba(255,255,255,0.04), rgba(0,0,0,0));
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
+/* Mobile top bar */
+@media (max-width: 720px) {
+  .mobile-topbar {
+    position: relative;
+    display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; gap: 8px;
+    width: 100%; height: 48px; padding: 6px calc(12px + env(safe-area-inset-right, 0)) 6px calc(12px + env(safe-area-inset-left, 0));
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 0 2px rgba(0,245,255,0.08) inset;
+    backdrop-filter: blur(10px);
+  }
+  .mobile-topbar .mtb-title { text-align: center; font-family: "Orbitron", monospace; letter-spacing: 2px; font-weight: 800; color: var(--text); text-shadow: 0 0 10px rgba(0,245,255,0.25); }
+  .mobile-topbar .mtb-btn { display: grid; place-items: center; height: 40px; width: 40px; border-radius: 10px; background: transparent; border: none; color: var(--text); box-shadow: none; -webkit-tap-highlight-color: transparent; cursor: pointer; }
+  .mobile-topbar .mtb-btn svg { width: 24px; height: 24px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgba(0,245,255,0.25)); }
+}
 
 .app-footer {
   opacity: 0.8;
   font-size: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+}
+
+/* Hide mobile topbar only on desktop and larger screens */
+@media (min-width: 721px) {
+  .mobile-topbar { display: none !important; }
 }
 
 .brand {
@@ -409,6 +430,9 @@ body {
 
 .glass { backdrop-filter: blur(10px); }
 
+/* Hide GameBoy shell and mobile controls by default (desktop/web) */
+.gb-controls, .gb-dpad, .gb-ab, .gb-start-select { display: none; }
+
 .status { display: grid; gap: 10px; }
 .badge {
   display: inline-block;
@@ -584,6 +608,13 @@ canvas { touch-action: none; }
   .ttt-cell { font-size: 50px; }
   .g2048-cell { height: 78px; }
   .simon { height: 140px; }
+  /* Guess the Number — unified mobile layout */
+  .guess-card { width: 100%; padding: 12px; }
+  .guess-title { font-size: 16px; margin-bottom: 8px; }
+  .guess-controls { grid-template-columns: 1fr; gap: 10px; }
+  .guess-controls input { width: 100%; font-size: 16px; padding: 12px; }
+  .guess-controls .btn { width: 100%; }
+  .guess-msg { min-height: 20px; font-size: 13px; }
 }
 
 @media (max-width: 520px) {
@@ -606,6 +637,13 @@ canvas { touch-action: none; }
   .uno-center { gap: 12px; }
   .uno-pile { height: 110px; width: 90px; }
   .uno-card { width: 52px; height: 76px; border-radius: 8px; }
+  /* Guess the Number mobile layout */
+  .guess-card { width: 100%; padding: 12px; }
+  .guess-title { font-size: 16px; margin-bottom: 8px; }
+  .guess-controls { grid-template-columns: 1fr; gap: 8px; }
+  .guess-controls input { width: 100%; font-size: 16px; padding: 12px; }
+  .guess-controls .btn { width: 100%; }
+  .guess-msg { min-height: 20px; font-size: 13px; }
 }
 
 @media (max-width: 380px) {
@@ -616,13 +654,24 @@ canvas { touch-action: none; }
   .memory-grid { grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 6px; }
   .mem-front, .mem-back { font-size: clamp(12px, 5.2vw, 24px); }
   .uno-card { width: 46px; height: 68px; }
+  /* Extra-small tweaks for Guess */
+  .guess-card { padding: 10px; }
+  .guess-title { font-size: 15px; }
+  .guess-controls { gap: 6px; }
+  .guess-controls .btn { padding: 10px 12px; }
 }
 
 /* GameBoy-style shell (mobile only) without altering game colors */
 @media (max-width: 720px) {
-  .gb-shell { display: grid; place-items: center; margin-top: 12px; }
+  /* Hide desktop header parts on mobile; show only the mobile-topbar */
+  .app-header .brand, .app-header .header-actions { display: none; }
+  .app-header { padding: 8px 12px; }
+  .flappy-layout { padding: 8px; display: grid; align-content: start; justify-items: center; height: 100%; }
+  .gb-shell { display: grid; place-items: center; margin-top: 0; height: 100%; width: 100%; }
   .gb-body {
     width: min(94vw, 420px);
+    min-width: 320px;
+    min-height: 640px;
     border-radius: 18px;
     background: linear-gradient(180deg, #d6d7d0, #c1c3bb);
     border: 1px solid #8c8f87;
@@ -630,8 +679,11 @@ canvas { touch-action: none; }
     padding: 14px 14px 18px 14px;
     display: grid;
     grid-template-rows: auto 1fr auto;
-    max-height: calc(100vh - 80px);
+    height: calc(100vh - 72px);
+    max-height: 100vh;
   }
+  /* Tighter body variant to reduce blank area for certain games */
+  .gb-body.gb-tight { max-height: calc(100vh - 30px); }
   .gb-screen {
     border-radius: 12px;
     background: linear-gradient(180deg, #3e3f45, #2c2d30);
@@ -645,10 +697,37 @@ canvas { touch-action: none; }
     border-radius: 6px 6px 0 0;
     margin-bottom: 8px;
   }
-  .gb-screen-window { border-radius: 8px; overflow: auto; height: clamp(220px, 52vh, 520px); }
+  .gb-screen-window { border-radius: 8px; overflow: auto; height: calc(100vh - 160px); -webkit-overflow-scrolling: touch; }
+  /* Pong-specific full-height view (reduce chrome) */
+  .gb-body.gb-pong { grid-template-rows: 1fr auto; }
+  .gb-body.gb-pong .gb-screen { display: grid; grid-template-rows: auto 1fr; min-height: 0; }
+  .gb-body.gb-pong .gb-screen-window { height: auto; min-height: 0; overflow: hidden; }
+  .gb-body.gb-pong .gb-controls { display: none; }
+  .pong-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pong-nav .btn { height: 52px; }
+  /* Breakout mobile layout with bottom LEFT/RIGHT buttons */
+  .gb-body.gb-breakout { grid-template-rows: 1fr auto; }
+  .gb-body.gb-breakout .gb-screen { display: grid; grid-template-rows: auto 1fr; min-height: 0; }
+  .gb-body.gb-breakout .gb-screen-window { height: auto; min-height: 0; overflow: hidden; }
+  .br-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .br-nav .btn { height: 52px; }
+  /* Flappy-specific layout: screen fills remaining space above the fixed-height button */
+  .gb-body.gb-flappy { grid-template-rows: 1fr auto; gap: 10px; }
+  .gb-body.gb-flappy .gb-screen { display: grid; grid-template-rows: auto 1fr; min-height: 0; }
+  .gb-body.gb-flappy .gb-screen-window { height: auto; min-height: 0; }
+  /* Expanded mode for mobile: increase screen window height even more and reduce chrome */
+  .gb-body.gb-expand .gb-screen-window { height: calc(100vh - 100px); }
+  .gb-body.gb-expand .gb-controls { display: none; }
+  .gb-body.gb-expand + .gb-start-select { display: none; }
+  /* FLAP button on mobile */
+  .expand-btn { display: block; margin-top: 10px; width: 100%; height: 58px; font-weight: 800; letter-spacing: 1px; }
+  /* For tight layouts (e.g., 2048), let content define height to remove extra space */
+  .gb-body.gb-tight .gb-screen-window { height: auto; max-height: none; }
+  .gb-body.gb-tight .gb-controls { margin-top: 8px; }
   .gb-screen-window > * { max-height: 100%; }
   .gb-screen-window .flappy-frame { height: 100%; }
   .gb-screen-window .flappy-canvas { height: 100% !important; max-height: 100%; }
+  .gb-screen-window .tactics-stage { width: 100%; }
   .gb-screen-window .uno-stage,
   .gb-screen-window .g2048-card,
   .gb-screen-window .ttt-wrapper,
@@ -656,9 +735,37 @@ canvas { touch-action: none; }
   .gb-screen-window .rps-card,
   .gb-screen-window .hangman-card,
   .gb-screen-window .flappy-frame { width: 100%; }
+  /* Make inner game wrappers flexible to consume available height */
+  .gb-screen-window .uno-stage,
+  .gb-screen-window .g2048-card,
+  .gb-screen-window .ttt-wrapper,
+  .gb-screen-window .memory-card,
+  .gb-screen-window .rps-card,
+  .gb-screen-window .hangman-card {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+  }
+  .gb-screen-window .memory-grid,
+  .gb-screen-window .g2048-grid,
+  .gb-screen-window .uno-hand.cpu,
+  .gb-screen-window .uno-hand.player,
+  .gb-screen-window .rps-card,
+  .gb-screen-window .ttt-wrapper {
+    overflow: auto;
+  }
+  /* Ensure chess board fits inside bezel without overflow */
+  .gb-screen-window .stage-3d,
+  .gb-screen-window .board {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-height: 100%;
+  }
 
   /* Controls */
-  .gb-controls { margin-top: 16px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .gb-controls { margin-top: 8px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
   .gb-dpad {
     display: grid;
     grid-template-columns: 48px 48px 48px;

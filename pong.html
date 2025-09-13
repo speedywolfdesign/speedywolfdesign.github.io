@@ -23,10 +23,10 @@
         </div>
       </header>
 
-      <main class="flappy-layout">
+      <main class="flappy-layout" style="min-height: 100vh;">
         <section class="flappy-wrapper">
           <div class="gb-shell">
-            <div class="gb-body">
+            <div class="gb-body gb-pong">
               <div class="gb-screen">
                 <div class="gb-screen-bezel"></div>
                 <div class="gb-screen-window">
@@ -42,18 +42,9 @@
                   </div>
                 </div>
               </div>
-              <div class="gb-controls">
-                <div class="gb-dpad" aria-label="D-Pad Controls">
-                  <div class="spacer"></div>
-                  <button class="gb-key" data-dir="up" aria-label="Up">▲</button>
-                  <div class="spacer"></div>
-                  <button id="pongLeftBtn" class="gb-key" aria-label="Left">◀</button>
-                  <div class="spacer"></div>
-                  <button id="pongRightBtn" class="gb-key" aria-label="Right">▶</button>
-                  <div class="spacer"></div>
-                  <button class="gb-key" data-dir="down" aria-label="Down">▼</button>
-                  <div class="spacer"></div>
-                </div>
+              <div class="pong-nav">
+                <button id="pongUpBtn" class="btn" aria-label="Move Up">UP</button>
+                <button id="pongDownBtn" class="btn" aria-label="Move Down">DOWN</button>
               </div>
             </div>
           </div>
@@ -77,6 +68,8 @@
     </div>
 
     <script src="audio.js"></script>
+    <script src="mobile_nav.js"></script>
+    <script src="controls.js"></script>
     <script src="pong.js"></script>
   </body>
   </html>

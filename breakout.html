@@ -23,10 +23,10 @@
         </div>
       </header>
 
-      <main class="flappy-layout">
+      <main class="flappy-layout" style="min-height: 100vh;">
         <section class="flappy-wrapper">
           <div class="gb-shell">
-            <div class="gb-body">
+            <div class="gb-body gb-tight gb-breakout">
               <div class="gb-screen">
                 <div class="gb-screen-bezel"></div>
                 <div class="gb-screen-window">
@@ -42,11 +42,9 @@
                   </div>
                 </div>
               </div>
-              <div class="gb-controls">
-                <div class="gb-ab">
-                  <button id="brLeft" class="gb-key" aria-label="Left">◀</button>
-                  <button id="brRight" class="gb-key" aria-label="Right">▶</button>
-                </div>
+              <div class="br-nav">
+                <button id="brLeft" class="btn" aria-label="Left">LEFT</button>
+                <button id="brRight" class="btn" aria-label="Right">RIGHT</button>
               </div>
             </div>
           </div>
@@ -70,6 +68,8 @@
     </div>
 
     <script src="audio.js"></script>
+    <script src="mobile_nav.js"></script>
+    <script src="controls.js"></script>
     <script src="breakout.js"></script>
   </body>
   </html>

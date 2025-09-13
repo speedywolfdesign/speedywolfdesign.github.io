@@ -32,6 +32,7 @@
   let right = { x:  vw - 24 - paddleW, y: (vh - paddleH)/2, vy: 0 };
   let ball = { x: vw/2, y: vh/2, vx: ballSpeed, vy: ballSpeed * 0.25 };
   let score = { l: 0, r: 0 };
+  const aiSpeed = Math.floor(paddleSpeed * 0.92);
   // Bounce visuals
   let ballBounce = 0; // seconds
   let leftBounce = 0, rightBounce = 0;
@@ -46,26 +47,14 @@
     ballBounce = 0;
   }
 
+  // Player controls: ArrowUp/ArrowDown move the left paddle only
   window.addEventListener("keydown", (e) => {
-    if (e.code === "KeyW") left.vy = -paddleSpeed;
-    if (e.code === "KeyS") left.vy = paddleSpeed;
-    if (e.code === "ArrowUp") right.vy = -paddleSpeed;
-    if (e.code === "ArrowDown") right.vy = paddleSpeed;
+    if (e.code === "ArrowUp") left.vy = -paddleSpeed;
+    if (e.code === "ArrowDown") left.vy = paddleSpeed;
   });
   window.addEventListener("keyup", (e) => {
-    if (e.code === "KeyW" || e.code === "KeyS") left.vy = 0;
-    if (e.code === "ArrowUp" || e.code === "ArrowDown") right.vy = 0;
+    if (e.code === "ArrowUp" || e.code === "ArrowDown") left.vy = 0;
   });
-  if (leftBtn) {
-    leftBtn.addEventListener('pointerdown', () => { left.vy = -paddleSpeed; });
-    leftBtn.addEventListener('pointerup', () => { left.vy = 0; });
-    leftBtn.addEventListener('pointerleave', () => { if (left.vy < 0) left.vy = 0; });
-  }
-  if (rightBtn) {
-    rightBtn.addEventListener('pointerdown', () => { right.vy = paddleSpeed; });
-    rightBtn.addEventListener('pointerup', () => { right.vy = 0; });
-    rightBtn.addEventListener('pointerleave', () => { if (right.vy > 0) right.vy = 0; });
-  }
   restartBtn.addEventListener("click", () => { score.l = 0; score.r = 0; updateHUD(); if (modal) modal.classList.add("hidden"); resetBall(Math.random()<0.5); });
   if (modalRestart) modalRestart.addEventListener("click", () => { score.l = 0; score.r = 0; updateHUD(); modal.classList.add("hidden"); resetBall(Math.random()<0.5); });
   let music = null; let sfx = null; if (typeof createChiptune === 'function' && musicBtn) { music = createChiptune('pong'); sfx = createSFX(); musicBtn.addEventListener("click", () => { if (music.isPlaying()) { music.pause(); musicBtn.textContent = "Music: Off"; } else { music.play(); musicBtn.textContent = "Music: On"; } }); }
@@ -76,6 +65,10 @@
     if (ballBounce > 0) ballBounce = Math.max(0, ballBounce - dt);
     if (leftBounce > 0) leftBounce = Math.max(0, leftBounce - dt);
     if (rightBounce > 0) rightBounce = Math.max(0, rightBounce - dt);
+    // Simple CPU AI for right paddle
+    const rightCenter = right.y + paddleH/2;
+    const targetY = ball.y - paddleH/2;
+    if (rightCenter < targetY - 6) right.vy = aiSpeed; else if (rightCenter > targetY + 6) right.vy = -aiSpeed; else right.vy = 0;
     left.y += left.vy * dt; right.y += right.vy * dt;
     left.y = Math.max(0, Math.min(vh - paddleH, left.y));
     right.y = Math.max(0, Math.min(vh - paddleH, right.y));
@@ -163,6 +156,19 @@
 
   function layout() {
     right.x = vw - 24 - paddleW; left.y = (vh - paddleH)/2; right.y = (vh - paddleH)/2; resetBall(Math.random()<0.5);
+  }
+  // On-screen buttons for up/down
+  const upBtn = document.getElementById('pongUpBtn');
+  const downBtn = document.getElementById('pongDownBtn');
+  if (upBtn) {
+    upBtn.addEventListener('pointerdown', () => { left.vy = -paddleSpeed; });
+    upBtn.addEventListener('pointerup', () => { left.vy = 0; });
+    upBtn.addEventListener('pointerleave', () => { if (left.vy < 0) left.vy = 0; });
+  }
+  if (downBtn) {
+    downBtn.addEventListener('pointerdown', () => { left.vy = paddleSpeed; });
+    downBtn.addEventListener('pointerup', () => { left.vy = 0; });
+    downBtn.addEventListener('pointerleave', () => { if (left.vy > 0) left.vy = 0; });
   }
   layout(); updateHUD(); requestAnimationFrame(loop);
 })();

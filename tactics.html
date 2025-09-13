@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tactical Shooter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="tactics.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">🎯</span>
+          <h1>TACTICAL SHOOTER</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="tacReset" class="btn primary">New Game</button>
+        </div>
+      </header>
+
+      <main class="flappy-layout" style="min-height: 100vh;">
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body gb-tight gb-tactics">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="tactics-stage glass" style="margin:0;">
+                    <div class="tac-hud">
+                      <div class="obj">Defeated: <strong id="objCount">0</strong>/<span id="objTotal">0</span></div>
+                      <div class="score">Score: <strong id="scoreText">0</strong></div>
+                      <div class="stage">Stage: <strong id="stageText">1</strong>/10</div>
+                      <div class="hpwrap">
+                        <div class="hpbar" aria-label="Health"><div id="hpFill" class="hpbar-fill" style="width: 100%;"></div></div>
+                        <div class="hp">HP: <strong id="hpText">100</strong></div>
+                      </div>
+                    </div>
+                    <canvas id="tacticsCanvas" class="tactics-canvas" aria-label="Tactical Shooter" role="img" tabindex="0"></canvas>
+                    <div class="tac-hint">Move: WASD/Arrows • Shoot: Space / Click • Plan: Hold Shift</div>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Top-down tactical 2D shooter • Cover and line-of-sight</span>
+      </footer>
+    </div>
+
+    <div id="gameModal" class="game-modal hidden" aria-modal="true" role="dialog">
+      <div class="content glass">
+        <h2 id="modalTitle">Mission Complete</h2>
+        <p id="modalText"></p>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="modalRestart" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="mobile_nav.js"></script>
+    <script src="tactics.js"></script>
+  </body>
+  </html>
+
+

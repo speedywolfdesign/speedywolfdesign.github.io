@@ -1,0 +1,28 @@
+.tactics-stage { width: min(860px, 94vw); padding: 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); }
+.tactics-canvas { width: 100%; height: min(64vh, 620px); display: block; background: #e9edf3; border-radius: 10px; }
+.tac-hud { display: flex; gap: 12px; align-items: center; justify-content: flex-start; margin-bottom: 8px; flex-wrap: wrap; }
+.tac-hud .obj, .tac-hud .hp, .tac-hud .score, .tac-hud .stage { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); padding: 6px 10px; border-radius: 999px; font-family: "Orbitron", monospace; }
+.hpwrap { display: flex; align-items: center; gap: 8px; }
+.hpbar { width: 160px; height: 12px; border-radius: 999px; background: rgba(255,255,255,0.2); overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+.hpbar-fill { height: 100%; background: linear-gradient(90deg, #20f381, #ffb020); width: 100%; }
+.tac-hint { text-align: center; opacity: 0.85; margin-top: 8px; }
+
+/* Minimalist tiles */
+.tile-wall { fill: #a9b0b8; }
+.tile-floor { fill: #eef1f5; }
+.tile-crate { fill: #d93636; }
+
+/* Simple shadows using drop-shadow filter */
+.shadow { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25)); }
+
+@media (max-width: 720px) {
+  .tactics-canvas { height: 60vh; }
+}
+
+/* Desktop: expand to fill the screen */
+@media (min-width: 721px) {
+  .tactics-stage { width: 100%; }
+  .tactics-canvas { height: 84vh; }
+}
+
+

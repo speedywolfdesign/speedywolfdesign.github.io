@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Bookworm</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo">🔤</span>
+          <h1>NEON BOOKWORM</h1>
+        </div>
+        <div class="header-actions">
+          <a class="btn" href="index.html">Home</a>
+          <button id="musicBtn" class="btn">Music: Off</button>
+          <button id="bwReset" class="btn primary">New Game</button>
+        </div>
+      </header>
+
+      <main class="flappy-layout" style="min-height: 100vh;">
+        <section class="flappy-wrapper">
+          <div class="gb-shell">
+            <div class="gb-body gb-tight">
+              <div class="gb-screen">
+                <div class="gb-screen-bezel"></div>
+                <div class="gb-screen-window">
+                  <section class="g2048-card glass" style="margin:0; display:grid; grid-template-rows:auto 1fr auto;">
+                    <div class="g2048-hud">Score: <strong id="bwScore">0</strong></div>
+                    <div id="bwGrid" class="memory-grid"></div>
+                    <div style="text-align:center; opacity:0.9; margin-top:8px;">Select adjacent letters to form words</div>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>Link letters to form valid words • Longer words score more</span>
+      </footer>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="mobile_nav.js"></script>
+    <script src="controls.js"></script>
+    <script src="bookworm.js"></script>
+  </body>
+  </html>
+
+
