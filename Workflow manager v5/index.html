@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Workflow Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-top">
+        <div class="app-header">
+          <h1 class="title">Add workflow</h1>
+          <p class="subtitle">Select users based on project access for manual configuration. No action needed for automatic configuration or skip.</p>
+        </div>
+
+        <section class="toolbar">
+        <div class="field">
+          <label>Project</label>
+          <div class="select">
+            <span class="pill pill-pa">PA</span>
+            <select id="projectSelect">
+              <option>Project A</option>
+              <option>Project B</option>
+              <option>Project C</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Template</label>
+          <div class="select">
+            <span class="icon icon-trend" aria-hidden="true"></span>
+            <select id="templateSelect">
+              <option>Trend</option>
+              <option>Blank</option>
+              <option>Strict</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="icon-button" title="Settings" aria-label="Settings">
+          <span class="icon icon-gear"></span>
+        </button>
+        </section>
+      </header>
+
+      <main class="workspace">
+        <aside class="people">
+          <div class="list reviewers">
+            <div class="list-header">Reviewers <span class="count" id="reviewerCount">(0)</span></div>
+            <ul id="reviewerPool" class="user-pool" aria-label="Reviewers list"></ul>
+          </div>
+          <div class="list approvers">
+            <div class="list-header">Approvers <span class="count" id="approverCount">(0)</span></div>
+            <ul id="approverPool" class="user-pool" aria-label="Approvers list"></ul>
+          </div>
+        </aside>
+
+        <section class="flows">
+          <div class="flow" data-type="review">
+            <div class="flow-bar">
+              <div class="flow-title">Review flow</div>
+              <div class="flow-modes" role="radiogroup" aria-label="Review flow mode">
+                <label><input type="radio" name="reviewMode" value="automatic"> Automatic</label>
+                <label><input type="radio" name="reviewMode" value="sequential" checked> Sequential</label>
+                <label><input type="radio" name="reviewMode" value="parallel"> Parallel</label>
+                <label><input type="radio" name="reviewMode" value="skip"> Skip</label>
+              </div>
+              <button class="link clear" data-action="clear" data-target="review">Clear all</button>
+            </div>
+            <div id="reviewCanvas" class="canvas" aria-label="Drag and drop users for the reviewers list">
+              <div class="hline top" aria-hidden="true"></div>
+              <div class="hline bottom" aria-hidden="true"></div>
+              <!-- <div class="end-of-flow" aria-hidden="true">End of flow</div> -->
+              <div class="canvas-hint">Drag and drop user form the reviewers list</div>
+            </div>
+          </div>
+
+          <div class="flow" data-type="approval">
+            <div class="flow-bar">
+              <div class="flow-title">Approval flow</div>
+              <div class="flow-modes" role="radiogroup" aria-label="Approval flow mode">
+                <label><input type="radio" name="approvalMode" value="automatic"> Automatic</label>
+                <label><input type="radio" name="approvalMode" value="sequential"> Sequential</label>
+                <label><input type="radio" name="approvalMode" value="parallel" checked> Parallel</label>
+                <label><input type="radio" name="approvalMode" value="skip"> Skip</label>
+              </div>
+              <button class="link clear" data-action="clear" data-target="approval">Clear all</button>
+            </div>
+            <div id="approvalCanvas" class="canvas" aria-label="Drag and drop users for the approvers list">
+              <div class="hline top" aria-hidden="true"></div>
+              <div class="hline bottom" aria-hidden="true"></div>
+              <!-- <div class="end-of-flow" aria-hidden="true">End of flow</div> -->
+              <div class="canvas-hint">Drag and drop user form the approvers list</div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="actions">
+        <button id="cancelBtn" class="btn btn-ghost">Cancel</button>
+        <button id="submitBtn" class="btn btn-primary">Add workflow</button>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+  </html>
+
+
