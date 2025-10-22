@@ -83,6 +83,15 @@ function installDnD() {
       if (isSequential) cleanupSequential(canvas);
       if (canvas.querySelectorAll('.chip').length === 0) canvas.classList.remove('has-items');
       autoGrow(canvas);
+      // If no chips remain with this user id anywhere, re-enable in pool
+      const remaining = document.querySelectorAll(`.chip[data-user-id="${user.id}"]`).length;
+      if (remaining === 0) {
+        const poolItem = document.querySelector(`.user-item[data-user-id="${user.id}"]`);
+        if (poolItem) {
+          poolItem.classList.remove('disabled');
+          poolItem.setAttribute('draggable', 'true');
+        }
+      }
     });
     // Only enable free-move dragging when not in a structured mode
     if (!isSequential && !isParallel) {
@@ -185,6 +194,12 @@ function installDnD() {
       e.preventDefault();
       canvas.classList.remove('drop-target');
       const user = JSON.parse(e.dataTransfer.getData('application/x-user'));
+      // disable pool item while present on any canvas
+      const poolItem = document.querySelector(`.user-item[data-user-id="${user.id}"]`);
+      if (poolItem) {
+        poolItem.classList.add('disabled');
+        poolItem.setAttribute('draggable', 'false');
+      }
       createChip(user, canvas, e.clientX, e.clientY);
       enforceLayout(canvas);
     });
