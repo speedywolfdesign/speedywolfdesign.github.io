@@ -45,9 +45,10 @@ body {
 .icon-button { height: 38px; width: 38px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); display: inline-flex; align-items: center; justify-content: center; color: var(--muted); cursor: pointer; }
 .icon-button:hover { color: var(--text); border-color: #2f3847; }
 
-.workspace { display: grid; grid-template-columns: 260px 1fr; gap: 12px; align-items: stretch; flex: 1; overflow: hidden; }
+.workspace { display: grid; grid-template-columns: 260px 1fr; gap: 12px; align-items: stretch; flex: 1; min-height: 0; }
 
-.people { display: grid; grid-template-rows: 1fr 1fr; gap: 12px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.people { position: sticky; top: 0; height: 100vh; overflow-y: hidden; display: grid; grid-template-rows: 1fr 1fr; gap: 12px; }
+.list { min-height: 0; }
 .list { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
 .list-header { padding: 10px 12px; font-weight: 600; font-size: 13px; border-bottom: 1px solid var(--border); }
 .list-header .count { color: var(--muted); font-weight: 500; margin-left: 6px; }
@@ -59,7 +60,7 @@ body {
 .user-name { font-size: 13px; }
 .user-hint { margin-left: auto; color: var(--muted); font-size: 11px; }
 
-.flows { display: grid; gap: 12px; overflow-y: auto; padding-right: 6px; }
+.flows { display: grid; gap: 12px; overflow-y: auto; padding-right: 6px; min-height: 0; height: 100%; }
 .flow { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
 .flow-bar { display: flex; align-items: center; gap: 16px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
 .flow-title { font-weight: 600; font-size: 13px; }
