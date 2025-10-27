@@ -1,0 +1,27 @@
+/* v2 overrides: sequential mode horizontal layout + connectors overlay */
+
+/* Make flows column match people column height */
+.flows { calc(100% - 220px); }
+
+/* Taller canvas for horizontal scroll */
+.canvas { min-height: 360px; height: calc(100% - 220px); }
+
+/* Make sequential look like parallel (horizontal row) */
+.canvas.sequential::before { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; height: 1px; background: rgba(255,255,255,0.08); }
+.canvas.sequential::after { content: ""; position: absolute; top: 8px; bottom: 8px; left: 50%; width: 1px; background: rgba(255,255,255,0.06); }
+.canvas.sequential .row { position: absolute; left: 12px; right: 12px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; gap: 28px; overflow-x: auto; padding-bottom: 24px; }
+.canvas.sequential .chip { position: static; min-width: 250px; max-width: 80%; cursor: move; }
+.canvas.sequential .chip .remove { margin-left: auto; }
+
+/* Ensure parallel chips are also centered vertically */
+.canvas.parallel .row { align-items: center; }
+/* Hide the short line above each chip in parallel mode */
+.canvas.parallel .row .chip::before { display: none !important; content: none !important; }
+
+/* Full-height row when scroll binding is active */
+.canvas .row[data-connect-scroll-bound="1"] { top: 0; bottom: 0; transform: none; }
+
+/* SVG overlay for connectors */
+.canvas .connectors { position: absolute; inset: 0; pointer-events: none; }
+
+.canvas.parallel::before { content: ""; position: absolute;}
