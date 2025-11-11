@@ -1,5 +1,7 @@
 (() => {
   const mmPerInch = 25.4;
+  // Inner white padding (border) inside each photo (in millimeters)
+  const INNER_BORDER_MM = 1;
 
   /** Common paper sizes in millimeters */
   const PAPER_SIZES_MM = {
@@ -39,6 +41,7 @@
     dpiSelect: document.getElementById("dpiSelect"),
     spacingInput: document.getElementById("spacingInput"),
     marginInput: document.getElementById("marginInput"),
+    innerBorderCheckbox: document.getElementById("innerBorderCheckbox"),
     renderBtn: document.getElementById("renderBtn"),
     cropBtn: document.getElementById("cropBtn"),
     downloadBtn: document.getElementById("downloadBtn"),
@@ -165,6 +168,9 @@
     const spacingPx = mmToPx(spacingMm, dpi);
     const tileWpx = mmToPx(passWmm, dpi);
     const tileHpx = mmToPx(passHmm, dpi);
+    const innerPadPx = (els.innerBorderCheckbox && els.innerBorderCheckbox.checked)
+      ? mmToPx(INNER_BORDER_MM, dpi)
+      : 0;
 
     clearCanvas(paperWpx, paperHpx);
 
@@ -200,15 +206,33 @@
         const x = startX + c * (tileWpx + spacingPx);
         const y = startY + r * (tileHpx + spacingPx);
 
-        // Image
-        drawImageCover(loadedImage, x, y, tileWpx, tileHpx);
+        // Image with inner padding (white border)
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(x, y, tileWpx, tileHpx);
+        const drawW = Math.max(0, tileWpx - innerPadPx * 2);
+        const drawH = Math.max(0, tileHpx - innerPadPx * 2);
+        drawImageCover(loadedImage, x + innerPadPx, y + innerPadPx, drawW, drawH);
 
-        // Cut guide: a subtle border around each tile
-        ctx.strokeStyle = "#9ca3af";
+        // Dotted cutting guide around each tile
+        ctx.strokeStyle = "#6b7280";
         ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
         ctx.strokeRect(x + 0.5, y + 0.5, tileWpx - 1, tileHpx - 1);
+        ctx.setLineDash([]);
       }
     }
+    ctx.restore();
+
+    // Fine footer text on the sheet (included in download)
+    ctx.save();
+    const footerText = "create by: 🐺speedywolfdesign";
+    const fontPx = Math.max(10, Math.round(mmToPx(3, dpi))); // about 3mm tall or at least 10px
+    ctx.font = `${fontPx}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"`;
+    ctx.fillStyle = "#6b7280";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    const footerY = paperHpx - Math.round(Math.max(4, Math.floor(mmToPx(Math.max(2, marginMm / 2), dpi))));
+    ctx.fillText(footerText, Math.round(paperWpx / 2), footerY);
     ctx.restore();
 
     els.fitInfo.textContent =
@@ -523,6 +547,9 @@
     els.dpiSelect.addEventListener("change", render);
     els.spacingInput.addEventListener("change", render);
     els.marginInput.addEventListener("change", render);
+    if (els.innerBorderCheckbox) {
+      els.innerBorderCheckbox.addEventListener("change", render);
+    }
     document.querySelectorAll('input[name="orientation"]').forEach((el) => {
       el.addEventListener("change", render);
     });
