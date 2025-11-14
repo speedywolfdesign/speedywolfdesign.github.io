@@ -10,6 +10,7 @@
     qualityRange: document.getElementById("qualityRange"),
     qualityValue: document.getElementById("qualityValue"),
     resizeBtn: document.getElementById("resizeBtn"),
+    bgRemoveBtn: document.getElementById("bgRemoveResizerBtn"),
     openCropBtn: document.getElementById("openCropBtn"),
     downloadBtn: document.getElementById("downloadResizedBtn"),
     canvas: document.getElementById("resizerCanvas"),
@@ -47,6 +48,7 @@
   let targetHpx = 0;
   let originalBytes = 0;
   let croppedImage = null;
+  let bodyPixModel = null;
 
   function clearCanvas() {
     els.canvas.width = 1;
@@ -206,6 +208,7 @@
         croppedImage = null;
         updateInputsFromImage();
         els.openCropBtn.disabled = false;
+        els.bgRemoveBtn.disabled = false;
       };
       reader.onload = (ev) => {
         i.src = String(ev.target.result);
@@ -238,8 +241,73 @@
     // crop controls
     els.openCropBtn.addEventListener("click", () => openCropper());
     bindCropper();
+    // background removal
+    els.bgRemoveBtn.addEventListener("click", async () => {
+      if (!img && !croppedImage) return;
+      try {
+        els.bgRemoveBtn.disabled = true;
+        const model = await ensureBodyPix();
+        const src = croppedImage || img;
+        const seg = await model.segmentPerson(src, { internalResolution: "medium", segmentationThreshold: 0.7 });
+        const sW = src.naturalWidth;
+        const sH = src.naturalHeight;
+        const out = document.createElement("canvas");
+        out.width = sW;
+        out.height = sH;
+        const octx = out.getContext("2d");
+        octx.drawImage(src, 0, 0);
+        const imgData = octx.getImageData(0, 0, sW, sH);
+        const mask = seg.data;
+        const d = imgData.data;
+        // make background transparent
+        for (let i = 0; i < mask.length; i++) {
+          if (mask[i] === 0) {
+            d[i * 4 + 3] = 0;
+          }
+        }
+        octx.putImageData(imgData, 0, 0);
+        const url = out.toDataURL("image/png");
+        const newImg = new Image();
+        newImg.onload = () => {
+          croppedImage = newImg;
+          render();
+          els.bgRemoveBtn.disabled = false;
+        };
+        newImg.src = url;
+      } catch (err) {
+        console.error("Background removal failed:", err);
+        els.bgRemoveBtn.disabled = false;
+      }
+    });
   }
 
+  // shared loader for body-pix
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = (e) => reject(e);
+      document.head.appendChild(s);
+    });
+  }
+  async function ensureBodyPix() {
+    if (bodyPixModel) return bodyPixModel;
+    if (!window.tf) {
+      await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js");
+    }
+    if (!window.bodyPix) {
+      await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.min.js");
+    }
+    bodyPixModel = await window.bodyPix.load({
+      architecture: "MobileNetV1",
+      outputStride: 16,
+      multiplier: 0.75,
+      quantBytes: 2,
+    });
+    return bodyPixModel;
+  }
   // ----- Cropper for resizer -----
   const cropState = {
     isOpen: false,

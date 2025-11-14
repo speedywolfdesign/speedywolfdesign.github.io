@@ -43,6 +43,7 @@
     marginInput: document.getElementById("marginInput"),
     innerBorderCheckbox: document.getElementById("innerBorderCheckbox"),
     renderBtn: document.getElementById("renderBtn"),
+    bgRemoveBtn: document.getElementById("bgRemoveBtn"),
     cropBtn: document.getElementById("cropBtn"),
     downloadBtn: document.getElementById("downloadBtn"),
     canvas: document.getElementById("canvas"),
@@ -55,28 +56,95 @@
     zoomRange: document.getElementById("zoomRange"),
     fitBtn: document.getElementById("fitBtn"),
     cropSizeSelect: document.getElementById("cropSizeSelect"),
-    // Source/camera elements (two-column selector)
-    sourceGrid: document.querySelector(".source-grid"),
-    dropzone: document.getElementById("dropzone"),
-    browseBtn: document.getElementById("browseBtn"),
-    modalFileInput: document.getElementById("modalFileInput"),
-    cameraIdle: document.getElementById("cameraIdle"),
-    cameraStartBtn: document.getElementById("cameraStartBtn"),
-    cameraLive: document.getElementById("cameraLive"),
     cropWrap: document.querySelector(".crop-canvas-wrap"),
-    cameraPreview: document.getElementById("cameraPreview"),
-    shutterBtn: document.getElementById("shutterBtn"),
-    cameraReview: document.getElementById("cameraReview"),
-    capturedPreview: document.getElementById("capturedPreview"),
-    retakeBtn: document.getElementById("retakeBtn"),
-    usePhotoBtn: document.getElementById("usePhotoBtn"),
+    modalBgRemoveBtn: document.getElementById("modalBgRemoveBtn"),
   };
 
   let loadedImage = null;
   const ctx = els.canvas.getContext("2d");
+  let bodyPixModel = null;
 
   function mmToPx(mm, dpi) {
     return Math.round((mm * dpi) / mmPerInch);
+  }
+
+  // ----- Background removal (BodyPix) -----
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = (e) => reject(e);
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureBodyPix() {
+    if (bodyPixModel) return bodyPixModel;
+    if (!window.tf) {
+      await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js");
+    }
+    if (!window.bodyPix) {
+      await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.min.js");
+    }
+    bodyPixModel = await window.bodyPix.load({
+      architecture: "MobileNetV1",
+      outputStride: 16,
+      multiplier: 0.75,
+      quantBytes: 2,
+    });
+    return bodyPixModel;
+  }
+
+  function hexToRgb(hex) {
+    const h = hex.replace("#", "");
+    const bigint = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+    return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+  }
+
+  async function removeBackground(bgColor = "#ffffff") {
+    if (!loadedImage) return;
+    try {
+      els.bgRemoveBtn.disabled = true;
+      const model = await ensureBodyPix();
+      const seg = await model.segmentPerson(loadedImage, {
+        internalResolution: "medium",
+        segmentationThreshold: 0.7,
+      });
+      const sW = loadedImage.naturalWidth;
+      const sH = loadedImage.naturalHeight;
+      const out = document.createElement("canvas");
+      out.width = sW;
+      out.height = sH;
+      const octx = out.getContext("2d");
+      octx.drawImage(loadedImage, 0, 0);
+      const imgData = octx.getImageData(0, 0, sW, sH);
+      const data = imgData.data;
+      const mask = seg.data;
+      const { r, g, b } = hexToRgb(bgColor);
+      for (let i = 0; i < mask.length; i++) {
+        if (mask[i] === 0) {
+          const p = i * 4;
+          data[p] = r;
+          data[p + 1] = g;
+          data[p + 2] = b;
+          data[p + 3] = 255;
+        }
+      }
+      octx.putImageData(imgData, 0, 0);
+      const url = out.toDataURL("image/png");
+      const img = new Image();
+      img.onload = () => {
+        loadedImage = img;
+        render();
+        els.bgRemoveBtn.disabled = false;
+      };
+      img.src = url;
+    } catch (e) {
+      console.error("Background removal failed:", e);
+      els.bgRemoveBtn.disabled = false;
+    }
   }
 
   function populatePaperSizes() {
@@ -306,36 +374,12 @@
     }
   }
 
-  function enterSourceMode(mode) {
-    // mode optional: "upload" | "camera"
-    show(els.sourceGrid, true);
-    show(els.cropWrap, false);
-    show(document.querySelector(".crop-controls"), false);
-    show(document.getElementById("sourceFooter"), true);
-    show(document.getElementById("cropFooter"), false);
-    // Reset camera panes
-    stopCamera();
-    show(els.cameraIdle, true);
-    show(els.cameraLive, false);
-    show(els.cameraReview, false);
-    setUseEnabled(!!pendingImageUrl);
-    if (mode === "camera") {
-      startCamera().then((ok) => {
-        if (ok) {
-          show(els.cameraIdle, false);
-          show(els.cameraLive, true);
-        }
-      });
-    }
-  }
+  function enterSourceMode() {}
 
   function enterCropMode() {
-    stopCamera();
-    show(els.sourceGrid, false);
+    stopCamera && stopCamera();
     show(els.cropWrap, true);
     show(document.querySelector(".crop-controls"), true);
-    show(document.getElementById("sourceFooter"), false);
-    show(document.getElementById("cropFooter"), true);
     // Initialize crop frame to current image and aspect
     initCropFrame();
     drawCropper();
@@ -391,6 +435,7 @@
   }
 
   function openCropper() {
+    if (!loadedImage) return;
     // Sync crop size dropdown with main selection
     if (els.cropSizeSelect) {
       populateCropSizes();
@@ -399,11 +444,7 @@
     els.cropModal.classList.add("open");
     els.cropModal.setAttribute("aria-hidden", "false");
     crop.isOpen = true;
-    if (loadedImage) {
-      enterCropMode();
-    } else {
-      enterSourceMode("upload");
-    }
+    enterCropMode();
   }
 
   function closeCropper() {
@@ -584,102 +625,9 @@
         if (crop.isOpen) openCropper();
       });
     }
-    // Source grid: browse and drop
-    if (els.browseBtn && els.modalFileInput) {
-      els.browseBtn.addEventListener("click", () => els.modalFileInput.click());
-      els.modalFileInput.addEventListener("change", (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            pendingImageUrl = String(ev.target.result);
-            setUseEnabled(true);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-    if (els.dropzone) {
-      const onFiles = (files) => {
-        const file = files && files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          pendingImageUrl = String(ev.target.result);
-          setUseEnabled(true);
-        };
-        reader.readAsDataURL(file);
-      };
-      ["dragenter","dragover"].forEach(evt => {
-        els.dropzone.addEventListener(evt, (e) => {
-          e.preventDefault(); e.stopPropagation();
-          els.dropzone.classList.add("dragging");
-        });
-      });
-      ["dragleave","drop"].forEach(evt => {
-        els.dropzone.addEventListener(evt, (e) => {
-          e.preventDefault(); e.stopPropagation();
-          els.dropzone.classList.remove("dragging");
-        });
-      });
-      els.dropzone.addEventListener("drop", (e) => {
-        const files = e.dataTransfer && e.dataTransfer.files;
-        onFiles(files);
-      });
-      els.dropzone.addEventListener("click", () => {
-        if (els.modalFileInput) els.modalFileInput.click();
-      });
-      els.dropzone.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          if (els.modalFileInput) els.modalFileInput.click();
-        }
-      });
-    }
-    // Camera flow
-    if (els.cameraStartBtn) {
-      els.cameraStartBtn.addEventListener("click", () => enterSourceMode("camera"));
-    }
-    if (els.shutterBtn) {
-      els.shutterBtn.addEventListener("click", () => {
-        if (!els.cameraPreview) return;
-        const v = els.cameraPreview;
-        const w = v.videoWidth || 1280;
-        const h = v.videoHeight || 720;
-        const out = document.createElement("canvas");
-        out.width = w;
-        out.height = h;
-        const octx = out.getContext("2d");
-        octx.drawImage(v, 0, 0, w, h);
-        const dataUrl = out.toDataURL("image/png");
-        pendingImageUrl = dataUrl;
-        if (els.capturedPreview) els.capturedPreview.src = dataUrl;
-        show(els.cameraLive, false);
-        show(els.cameraReview, true);
-        setUseEnabled(true);
-      });
-    }
-    if (els.retakeBtn) {
-      els.retakeBtn.addEventListener("click", () => {
-        enterSourceMode("camera");
-        setUseEnabled(false);
-      });
-    }
-    // Footer Use button
-    const useBtn = document.getElementById("useBtn");
-    if (useBtn) {
-      useBtn.addEventListener("click", () => {
-        if (!pendingImageUrl) return;
-        const img = new Image();
-        img.onload = () => {
-          loadedImage = img;
-          enterCropMode();
-          render();
-          pendingImageUrl = null;
-          setUseEnabled(false);
-        };
-        img.src = pendingImageUrl;
-      });
+    // Modal background removal
+    if (els.modalBgRemoveBtn) {
+      els.modalBgRemoveBtn.addEventListener("click", () => removeBackground("#ffffff"));
     }
   }
 
@@ -739,6 +687,9 @@
     });
     els.renderBtn.addEventListener("click", render);
     els.downloadBtn.addEventListener("click", downloadPng);
+    if (els.bgRemoveBtn) {
+      els.bgRemoveBtn.addEventListener("click", () => removeBackground("#ffffff"));
+    }
     els.cropBtn.addEventListener("click", () => {
       openCropper();
     });
@@ -751,6 +702,7 @@
     bindEvents();
     // Let user open modal to upload or use camera even without an image
     els.cropBtn.disabled = false;
+    if (els.bgRemoveBtn) els.bgRemoveBtn.disabled = true;
   }
 
   document.addEventListener("DOMContentLoaded", init);

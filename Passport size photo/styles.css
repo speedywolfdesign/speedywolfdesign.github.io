@@ -64,6 +64,37 @@ html, body {
   padding: 12px 16px;
 }
 
+/* Topbar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 1;
+}
+.topbar-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
 .app-header h1 {
   margin: 0 0 4px 0;
   font-size: 22px;

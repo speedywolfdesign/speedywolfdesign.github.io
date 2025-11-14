@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <nav class="topbar">
+      <a class="topbar-back" href="index.html" aria-label="Back to home">←</a>
+      <span class="topbar-title">Photo Booth</span>
+    </nav>
     <header class="app-header">
       <h1>Passport Size Photo Maker</h1>
       <p>Create printable sheets with proper spacing and cut guides.</p>
@@ -70,6 +74,7 @@
 
         <div class="control-actions">
           <button id="renderBtn" class="primary">Update Preview</button>
+          <button id="bgRemoveBtn" class="secondary" disabled>Remove Background</button>
           <button id="cropBtn" class="secondary" disabled>Crop</button>
           <button id="downloadBtn" class="secondary" disabled>Download PNG</button>
         </div>
@@ -92,42 +97,13 @@
       <div class="modal-dialog">
         <div class="modal-header">
           <h2 id="cropTitle">Upload click picture</h2>
-          <select id="cropSizeSelect" aria-label="Passport size for crop"></select>
+          <div style="display:flex; gap:8px; align-items:center; margin-left:auto;">
+            <select id="cropSizeSelect" aria-label="Passport size for crop"></select>
+            <button id="modalBgRemoveBtn" class="secondary" type="button">Remove Background</button>
+          </div>
         </div>
         <div class="modal-body">
-          <div class="source-grid">
-            <div class="source-left">
-              <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Upload photo">
-                <div class="dz-icon">📷</div>
-                <div class="dz-title">Drag & drop photo here</div>
-                <div class="dz-sub">or</div>
-                <button id="browseBtn" type="button" class="secondary">Browse from folder</button>
-                <input id="modalFileInput" type="file" accept="image/*" class="hidden">
-              </div>
-            </div>
-            <div class="source-right">
-              <div class="camera-panel">
-                <div class="camera-idle" id="cameraIdle">
-                  <button id="cameraStartBtn" class="primary" type="button">Click</button>
-                  <p class="tip">Note: Camera requires permission and works best over HTTPS.</p>
-                </div>
-                <div class="camera-live hidden" id="cameraLive">
-                  <video id="cameraPreview" playsinline autoplay></video>
-                  <div class="shutter-row">
-                    <button id="shutterBtn" class="shutter-btn" type="button" aria-label="Capture"></button>
-                  </div>
-                </div>
-                <div class="camera-review hidden" id="cameraReview">
-                  <img id="capturedPreview" alt="Captured preview">
-                  <div class="review-actions">
-                    <button id="retakeBtn" class="secondary" type="button">Retake</button>
-                    <button id="usePhotoBtn" class="primary" type="button">Use</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="crop-canvas-wrap hidden">
+          <div class="crop-canvas-wrap">
             <canvas id="cropCanvas"></canvas>
           </div>
           <div class="crop-controls">
@@ -138,11 +114,7 @@
           <p class="tip">Drag to pan. Use mouse wheel or Zoom slider to adjust. The clear rectangle defines the crop area constrained to the selected passport size.</p>
         </div>
         <div class="modal-footer">
-          <div id="sourceFooter" class="source-footer">
-            <div class="source-footer__label">Upload click picture</div>
-            <button id="useBtn" class="primary" disabled>Use</button>
-          </div>
-          <div id="cropFooter" class="crop-footer hidden">
+          <div id="cropFooter" class="crop-footer">
             <button id="cropCancelBtn" class="secondary">Cancel</button>
             <button id="cropApplyBtn" class="primary">Apply Crop</button>
           </div>
