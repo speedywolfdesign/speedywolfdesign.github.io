@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Heart Rate Detector</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -166,7 +167,7 @@
                 position: fixed;
                 left: 20px;
                 right: 20px;
-                bottom: 24px;
+                bottom: calc(24px + env(safe-area-inset-bottom));
                 height: 64px;
                 font-size: 22px;
                 border-radius: 999px;
@@ -483,7 +484,7 @@ function stop() {
     }
     if (track) {
         try {
-            const capabilities = typeof track.getCapabilities === "function" ? track.getCapabilities() : {}; 
+            const capabilities = typeof track.getCapabilities === "function" ? track.getCapabilities() : {};
             if (capabilities && "torch" in capabilities) {
                 track.applyConstraints({ advanced: [{ torch: false }] }).catch(() => {});
             }
