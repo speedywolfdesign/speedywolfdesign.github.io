@@ -117,7 +117,7 @@
             box-shadow: 0 1px 0 rgba(0,0,0,0.04) inset;
         }
         /* Responsive adjustments to match mobile UI */
-        @media (max-width: 740px) {
+        @media screen and (max-width: 740px), screen and (hover: none) and (pointer: coarse) {
             body {
                 padding: 0;
                 background: #0b1220;
@@ -231,6 +231,17 @@ let redValues = []; // { time, value } filtered values
 let filteredValue;
 let lastPeakTime = 0; // for pulse animation
 let running = false;
+
+// Ensure mobile-responsive CSS applies early when device is coarse pointer
+(function ensureMobileViewport() {
+    try {
+        const isCoarse = window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+        const isNarrow = window.matchMedia && window.matchMedia("(max-width: 740px)").matches;
+        if (isCoarse || isNarrow) {
+            document.documentElement.style.setProperty("--mobile", "1");
+        }
+    } catch (e) {}
+})();
 
 function setStatus(msg, isError = false) {
     statusEl.textContent = msg;
