@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heart Rate Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            text-align: center;
+            background: #f5f6fa;
+        }
+        .card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 24px 22px;
+        }
+        video {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            background: black;
+            object-fit: cover;
+            display: block;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.08);
+            z-index: 3;
+        }
+        #startBtn {
+            padding: 12px 22px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #stopBtn {
+            padding: 12px 22px;
+            border: none;
+            background: #e11d48;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 8px;
+        }
+        #bpm {
+            margin-top: 25px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        #instructions {
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        #status {
+            color: #475569;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .viz-wrap {
+            position: relative;
+            margin: 24px auto 8px auto;
+            width: 100%;
+            max-width: 900px;
+        }
+        #viz {
+            width: 100%;
+            height: 180px;
+            display: block;
+            background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+            border-radius: 10px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+        }
+        .pulse {
+            position: absolute;
+            left: 50%;
+            top: calc(50% - 8px);
+            transform: translate(-50%, -50%) scale(1);
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #ff7ab3, #e11d48);
+            border-radius: 999px;
+            box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.6);
+            pointer-events: none;
+        }
+        .pulse.beat {
+            animation: pulseBeat 350ms ease-out;
+        }
+        @keyframes pulseBeat {
+            0% { transform: translate(-50%, -50%) scale(0.9); box-shadow: 0 0 0 0 rgba(225,29,72,0.65); }
+            70% { transform: translate(-50%, -50%) scale(1.25); box-shadow: 0 0 24px 12px rgba(225,29,72,0.08); }
+            100% { transform: translate(-50%, -50%) scale(1.0); box-shadow: 0 0 0 0 rgba(225,29,72,0.0); }
+        }
+        .metrics {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 8px;
+            color: #1f2937;
+        }
+        .bpm-badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.04) inset;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Heart Rate Detector</h2>
+
+        <p id="instructions">Place your fingertip over the camera + Flashlight</p>
+
+        <button id="startBtn">Start Measuring</button>
+        <button id="stopBtn">Stop</button>
+
+        <div class="viz-wrap">
+            <canvas id="viz"></canvas>
+            <div id="pulse" class="pulse"></div>
+            <video id="video" autoplay playsinline muted></video>
+        </div>
+
+        <div class="metrics">
+            <span class="bpm-badge" id="bpm">BPM: --</span>
+        </div>
+        <p id="status">Ready.</p>
+    </div>
+
+    <script>
+        const video = document.getElementById("video");
+const bpmText = document.getElementById("bpm");
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+const statusEl = document.getElementById("status");
+const vizCanvas = document.getElementById("viz");
+const pulseEl = document.getElementById("pulse");
+let vizCtx;
+
+let stream, track, rafId;
+let redValues = []; // { time, value } filtered values
+let filteredValue;
+let lastPeakTime = 0; // for pulse animation
+let running = false;
+
+function setStatus(msg, isError = false) {
+    statusEl.textContent = msg;
+    statusEl.style.color = isError ? "#c0392b" : "#333";
+}
+
+startBtn.onclick = async () => {
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    try {
+        setStatus("Requesting camera...");
+        await startCamera();
+        setStatus("Camera started. Preparing frames...");
+        // Ensure we have metadata before processing sizes
+        await new Promise(resolve => {
+            if (video.readyState >= HTMLMediaElement.HAVE_METADATA) return resolve();
+            video.onloadedmetadata = () => resolve();
+        });
+        initVisualizer();
+        startProcessing();
+        setStatus("Measuring... Place finger on camera + flashlight.");
+    } catch (e) {
+        console.error(e);
+        setStatus("Failed to start: " + (e && e.message ? e.message : e), true);
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    }
+};
+
+stopBtn.onclick = () => {
+    stop();
+};
+
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+            audio: false
+        });
+    } catch (e) {
+        throw new Error("Camera permission denied or unavailable");
+    }
+
+    video.srcObject = stream;
+    await video.play();
+
+    track = stream.getVideoTracks()[0];
+
+    // Try enabling flashlight if supported
+    try {
+        const capabilities = typeof track.getCapabilities === "function" ? track.getCapabilities() : {};
+        if (capabilities && "torch" in capabilities) {
+            await track.applyConstraints({ advanced: [{ torch: true }] });
+            console.log("Flashlight ON");
+        } else {
+            console.log("Torch not supported");
+        }
+    } catch (e) {
+        console.log("Failed to enable torch");
+    }
+}
+
+function startProcessing() {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const SAMPLE_SIZE = 64; // downscale for performance
+
+    running = true;
+    filteredValue = undefined;
+    redValues = [];
+    lastPeakTime = 0;
+
+    function processFrame() {
+        if (!running) return;
+
+        // Ensure we have video frames
+        if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA ||
+            !video.videoWidth || !video.videoHeight) {
+            rafId = requestAnimationFrame(processFrame);
+            return;
+        }
+
+        canvas.width = SAMPLE_SIZE;
+        canvas.height = SAMPLE_SIZE;
+
+        // Draw scaled-down frame
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        let redSum = 0;
+        // Sum red channel
+        for (let i = 0; i < frame.length; i += 4) {
+            redSum += frame[i];
+        }
+        const avgRed = redSum / (frame.length / 4);
+
+        // Exponential moving average to smooth (low-pass)
+        const alpha = 0.2;
+        filteredValue = filteredValue === undefined ? avgRed : (alpha * avgRed + (1 - alpha) * filteredValue);
+
+        const now = performance.now();
+        redValues.push({ time: now, value: filteredValue });
+
+        // Keep last 10 seconds of data
+        const windowMs = 10000;
+        const cutoff = now - windowMs;
+        while (redValues.length && redValues[0].time < cutoff) {
+            redValues.shift();
+        }
+
+        computeBPM();
+        renderWaveform();
+
+        rafId = requestAnimationFrame(processFrame);
+    }
+
+    processFrame();
+}
+
+function computeBPM() {
+    if (redValues.length < 5) return;
+
+    // Dynamic threshold = mean of current window
+    const values = redValues.map(v => v.value);
+    const threshold = average(values);
+
+    // Find local maxima with minimum peak distance
+    const minPeakDistanceMs = 300; // ~200 bpm ceiling
+    const peaks = [];
+    for (let i = 1; i < redValues.length - 1; i++) {
+        const prev = redValues[i - 1];
+        const curr = redValues[i];
+        const next = redValues[i + 1];
+        if (curr.value > threshold && curr.value > prev.value && curr.value > next.value) {
+            if (!peaks.length || (curr.time - peaks[peaks.length - 1]) >= minPeakDistanceMs) {
+                peaks.push(curr.time);
+            }
+        }
+    }
+
+    // Trigger pulse on new peak
+    if (peaks.length) {
+        const latest = peaks[peaks.length - 1];
+        if (latest > lastPeakTime) {
+            lastPeakTime = latest;
+            triggerPulse();
+        }
+    }
+
+    if (peaks.length > 1) {
+        const intervals = [];
+        for (let i = 1; i < peaks.length; i++) {
+            intervals.push(peaks[i] - peaks[i - 1]);
+        }
+        const avgInterval = average(intervals);
+        if (avgInterval > 0 && isFinite(avgInterval)) {
+            const bpm = Math.round(60000 / avgInterval);
+            bpmText.innerText = "BPM: " + bpm;
+        }
+    }
+}
+
+function average(arr) {
+    return arr.reduce((a, b) => a + b) / arr.length;
+}
+
+function initVisualizer() {
+    vizCtx = vizCanvas.getContext("2d");
+    const resize = () => {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = vizCanvas.getBoundingClientRect();
+        vizCanvas.width = Math.max(300, Math.floor(rect.width * dpr));
+        vizCanvas.height = Math.max(120, Math.floor(rect.height * dpr));
+        vizCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    window.addEventListener("resize", resize);
+    resize();
+}
+
+function renderWaveform() {
+    if (!vizCtx) return;
+    const width = vizCanvas.width / (window.devicePixelRatio || 1);
+    const height = vizCanvas.height / (window.devicePixelRatio || 1);
+
+    // Clear
+    vizCtx.clearRect(0, 0, width, height);
+
+    // Grid lines
+    vizCtx.strokeStyle = "rgba(255,255,255,0.06)";
+    vizCtx.lineWidth = 1;
+    vizCtx.beginPath();
+    for (let x = 0; x <= width; x += 60) {
+        vizCtx.moveTo(x, 0);
+        vizCtx.lineTo(x, height);
+    }
+    for (let y = 0; y <= height; y += 45) {
+        vizCtx.moveTo(0, y);
+        vizCtx.lineTo(width, y);
+    }
+    vizCtx.stroke();
+
+    if (redValues.length < 2) return;
+
+    // Take last N points
+    const maxPoints = 500;
+    const data = redValues.slice(-maxPoints).map(v => v.value);
+    const minV = Math.min(...data);
+    const maxV = Math.max(...data);
+    const range = Math.max(1, maxV - minV);
+
+    // Gradient stroke
+    const grad = vizCtx.createLinearGradient(0, 0, width, 0);
+    grad.addColorStop(0, "#ff7ab3");
+    grad.addColorStop(1, "#00d4ff");
+
+    vizCtx.strokeStyle = grad;
+    vizCtx.lineWidth = 2;
+    vizCtx.beginPath();
+
+    for (let i = 0; i < data.length; i++) {
+        const x = (i / (data.length - 1)) * (width - 10) + 5;
+        const norm = (data[i] - minV) / range; // 0..1
+        const y = height - (norm * (height - 10)) - 5;
+        if (i === 0) vizCtx.moveTo(x, y);
+        else vizCtx.lineTo(x, y);
+    }
+    vizCtx.stroke();
+
+    // Glow overlay
+    vizCtx.shadowColor = "rgba(0, 212, 255, 0.2)";
+    vizCtx.shadowBlur = 12;
+    vizCtx.stroke();
+    vizCtx.shadowBlur = 0;
+}
+
+function triggerPulse() {
+    if (!pulseEl) return;
+    pulseEl.classList.remove("beat");
+    // Force reflow to restart animation
+    // eslint-disable-next-line no-unused-expressions
+    pulseEl.offsetWidth;
+    pulseEl.classList.add("beat");
+}
+
+function stop() {
+    running = false;
+    if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+    }
+    if (track) {
+        try {
+            const capabilities = typeof track.getCapabilities === "function" ? track.getCapabilities() : {};
+            if (capabilities && "torch" in capabilities) {
+                track.applyConstraints({ advanced: [{ torch: false }] }).catch(() => {});
+            }
+        } catch (e) {}
+    }
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+    }
+    stream = null;
+    track = null;
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    setStatus("Stopped.");
+}
+
+// Initialize buttons state
+stopBtn.disabled = true;
+
+    </script>
+</body>
+</html>
