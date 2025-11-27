@@ -116,6 +116,135 @@
             font-size: 14px;
             box-shadow: 0 1px 0 rgba(0,0,0,0.04) inset;
         }
+        /* Result overlay */
+        .result-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.45);
+            z-index: 20;
+            padding: 24px;
+        }
+        .result-overlay.show {
+            display: flex;
+        }
+        .result-modal {
+            width: 100%;
+            max-width: 740px;
+            background: #000000;
+            color: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+            padding: 28px 24px 32px 24px;
+        }
+        .heart-hero {
+            display: grid;
+            place-items: center;
+            margin: 12px 0 16px 0;
+            position: relative;
+        }
+        .heart-shape {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            transform: rotate(-45deg);
+            background: radial-gradient(circle at 30% 30%, #ff89c2 0%, #ff2c78 45%, #b90b4b 100%);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(255, 44, 120, 0.35), inset 0 0 0 4px rgba(255,255,255,0.12);
+        }
+        .heart-shape:before,
+        .heart-shape:after {
+            content: "";
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: inherit;
+            border-radius: 50%;
+            box-shadow: inherit;
+        }
+        .heart-shape:before {
+            top: -100px;
+            left: 0;
+        }
+        .heart-shape:after {
+            left: 100px;
+            top: 0;
+        }
+        .heart-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        }
+        .heart-value .num {
+            font-size: 64px;
+            line-height: 1;
+        }
+        .heart-value .unit {
+            font-size: 18px;
+            opacity: 0.9;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+        .hr-table {
+            margin-top: 18px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .hr-row,
+        .hr-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            padding: 14px 6px;
+        }
+        .hr-header {
+            font-weight: 700;
+            opacity: 0.95;
+        }
+        .hr-row {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.95);
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+        }
+        .modal-actions .again-btn {
+            padding: 12px 22px;
+            border: none;
+            background: #22c55e;
+            color: #052e16;
+            border-radius: 999px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        @media screen and (max-width: 740px), screen and (hover: none) and (pointer: coarse) {
+            .result-modal {
+                border-radius: 28px;
+                padding: 22px 18px 26px 18px;
+                margin: 0 8px;
+            }
+            .heart-shape {
+                width: 190px;
+                height: 190px;
+            }
+            .heart-shape:before,
+            .heart-shape:after {
+                width: 190px;
+                height: 190px;
+            }
+            .heart-value .num {
+                font-size: 60px;
+            }
+        }
         /* Responsive adjustments to match mobile UI */
         @media screen and (max-width: 740px), screen and (hover: none) and (pointer: coarse) {
             body {
@@ -216,6 +345,32 @@
         <p id="status">Ready.</p>
     </div>
 
+    <!-- Final Result Modal -->
+    <div id="resultOverlay" class="result-overlay" aria-hidden="true">
+        <div class="result-modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+            <div class="heart-hero">
+                <div class="heart-shape"></div>
+                <div class="heart-value">
+                    <div id="resultTitle" class="num">--</div>
+                    <div class="unit">BPM</div>
+                </div>
+            </div>
+            <div class="hr-table">
+                <div class="hr-header">
+                    <div>Age Group</div>
+                    <div>Heart Rate</div>
+                </div>
+                <div class="hr-row"><div>Toddler (1 to 3 years)</div><div>80 – 130</div></div>
+                <div class="hr-row"><div>Preschool (3 to 5 years)</div><div>80 – 110</div></div>
+                <div class="hr-row"><div>School Age (6 to 12 years)</div><div>70 – 100</div></div>
+                <div class="hr-row"><div>Adolescents (13 to 18 years) and Adults</div><div>60 – 100</div></div>
+            </div>
+            <div class="modal-actions">
+                <button id="measureAgainBtn" class="again-btn">Measure Again</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const video = document.getElementById("video");
 const bpmText = document.getElementById("bpm");
@@ -225,12 +380,21 @@ const statusEl = document.getElementById("status");
 const vizCanvas = document.getElementById("viz");
 const pulseEl = document.getElementById("pulse");
 let vizCtx;
+const resultOverlay = document.getElementById("resultOverlay");
+const resultTitle = document.getElementById("resultTitle");
+const measureAgainBtn = document.getElementById("measureAgainBtn");
 
 let stream, track, rafId;
 let redValues = []; // { time, value } filtered values
 let filteredValue;
 let lastPeakTime = 0; // for pulse animation
 let running = false;
+const SCAN_DURATION_MS = 20000; // 20 seconds
+let scanStartTime = 0;
+let scanFinalized = false;
+let scanningTimeoutId = null;
+let countdownIntervalId = null;
+let beatTimes = []; // timestamps (performance.now) of detected peaks
 
 // Ensure mobile-responsive CSS applies early when device is coarse pointer
 (function ensureMobileViewport() {
@@ -262,7 +426,7 @@ startBtn.onclick = async () => {
         });
         initVisualizer();
         startProcessing();
-        setStatus("Measuring... Place finger on camera + flashlight.");
+        beginTimedScan();
     } catch (e) {
         console.error(e);
         setStatus("Failed to start: " + (e && e.message ? e.message : e), true);
@@ -272,7 +436,8 @@ startBtn.onclick = async () => {
 };
 
 stopBtn.onclick = () => {
-    stop();
+    // Manual stop also finalizes with current data
+    finalizeScan(false);
 };
 
 async function startCamera() {
@@ -313,6 +478,7 @@ function startProcessing() {
     filteredValue = undefined;
     redValues = [];
     lastPeakTime = 0;
+    beatTimes = [];
 
     function processFrame() {
         if (!running) return;
@@ -389,6 +555,7 @@ function computeBPM() {
         if (latest > lastPeakTime) {
             lastPeakTime = latest;
             triggerPulse();
+            beatTimes.push(latest);
         }
     }
 
@@ -487,6 +654,61 @@ function triggerPulse() {
     pulseEl.classList.add("beat");
 }
 
+function beginTimedScan() {
+    scanFinalized = false;
+    scanStartTime = performance.now();
+    // countdown
+    if (countdownIntervalId) clearInterval(countdownIntervalId);
+    countdownIntervalId = setInterval(() => {
+        const remaining = Math.max(0, SCAN_DURATION_MS - (performance.now() - scanStartTime));
+        const seconds = Math.ceil(remaining / 1000);
+        setStatus("Scanning... " + seconds + "s left");
+    }, 250);
+    // auto finalize after duration
+    if (scanningTimeoutId) clearTimeout(scanningTimeoutId);
+    scanningTimeoutId = setTimeout(() => finalizeScan(true), SCAN_DURATION_MS);
+}
+
+function computeAverageBpmFromBeats(times) {
+    if (!times || times.length < 2) return null;
+    const intervals = [];
+    for (let i = 1; i < times.length; i++) {
+        const dt = times[i] - times[i - 1];
+        // accept plausible heart beat intervals ~30-200 bpm => 300-2000ms
+        if (dt >= 300 && dt <= 2000) intervals.push(dt);
+    }
+    if (!intervals.length) return null;
+    const avgInterval = average(intervals);
+    if (!isFinite(avgInterval) || avgInterval <= 0) return null;
+    return Math.round(60000 / avgInterval);
+}
+
+function finalizeScan(auto = false) {
+    if (scanFinalized) return;
+    scanFinalized = true;
+    if (countdownIntervalId) {
+        clearInterval(countdownIntervalId);
+        countdownIntervalId = null;
+    }
+    if (scanningTimeoutId) {
+        clearTimeout(scanningTimeoutId);
+        scanningTimeoutId = null;
+    }
+    // Compute average BPM from collected beats within scan window
+    const beats = beatTimes.filter(t => t >= scanStartTime && t <= scanStartTime + SCAN_DURATION_MS);
+    const avgBpm = computeAverageBpmFromBeats(beats);
+    // Stop measurement and camera
+    stop();
+    if (avgBpm) {
+        bpmText.innerText = "BPM: " + avgBpm;
+        setStatus("Scan complete. Final BPM: " + avgBpm);
+        showResultModal(avgBpm);
+    } else {
+        setStatus("Scan complete. Not enough signal to compute BPM.", true);
+        showResultModal(null);
+    }
+}
+
 function stop() {
     running = false;
     if (rafId) {
@@ -513,6 +735,32 @@ function stop() {
 
 // Initialize buttons state
 stopBtn.disabled = true;
+
+// Modal helpers
+function showResultModal(bpm) {
+    if (typeof bpm === "number" && isFinite(bpm)) {
+        resultTitle.textContent = bpm;
+    } else {
+        resultTitle.textContent = "--";
+    }
+    resultOverlay.classList.add("show");
+    resultOverlay.setAttribute("aria-hidden", "false");
+}
+
+function hideResultModal() {
+    resultOverlay.classList.remove("show");
+    resultOverlay.setAttribute("aria-hidden", "true");
+}
+
+measureAgainBtn.addEventListener("click", () => {
+    hideResultModal();
+    startBtn.click();
+});
+resultOverlay.addEventListener("click", (e) => {
+    if (e.target === resultOverlay) {
+        hideResultModal();
+    }
+});
 
     </script>
 </body>
