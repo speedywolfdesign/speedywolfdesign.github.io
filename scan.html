@@ -115,6 +115,82 @@
             font-size: 14px;
             box-shadow: 0 1px 0 rgba(0,0,0,0.04) inset;
         }
+        /* Responsive adjustments to match mobile UI */
+        @media (max-width: 740px) {
+            body {
+                padding: 0;
+                background: #0b1220;
+            }
+            .card {
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                padding: 24px 16px 110px 16px; /* leave room for bottom button */
+                background: #ffffff;
+            }
+            .card h2 {
+                font-size: 38px;
+                margin: 8px 0 6px 0;
+            }
+            #instructions {
+                font-size: 18px;
+                color: #8a8f98;
+                margin-bottom: 12px;
+            }
+            .viz-wrap {
+                margin: 0 -16px;
+                width: calc(100% + 32px);
+            }
+            #viz {
+                height: 56vh;
+                border-radius: 0;
+            }
+            .metrics {
+                position: absolute;
+                top: 24px;
+                left: 0;
+                right: 0;
+                margin: 0;
+                z-index: 2;
+                color: #ffffff;
+            }
+            .bpm-badge {
+                background: transparent;
+                color: #ffffff;
+                font-size: 56px;
+                padding: 0;
+                box-shadow: none;
+            }
+            /* Start/Stop as a single bottom pill; show only the active (not disabled) one */
+            #startBtn, #stopBtn {
+                position: fixed;
+                left: 20px;
+                right: 20px;
+                bottom: 24px;
+                height: 64px;
+                font-size: 22px;
+                border-radius: 999px;
+                box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+                z-index: 5;
+            }
+            #startBtn {
+                background: #178a00;
+            }
+            #stopBtn {
+                background: #e11d48;
+            }
+            button:disabled {
+                display: none;
+            }
+            /* Camera preview slightly larger */
+            video#video {
+                width: 140px;
+                height: 140px;
+                right: 16px;
+                bottom: 16px;
+                border-radius: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -130,12 +206,12 @@
         <div class="viz-wrap">
             <canvas id="viz"></canvas>
             <div id="pulse" class="pulse"></div>
+            <div class="metrics">
+                <span class="bpm-badge" id="bpm">BPM: --</span>
+            </div>
             <video id="video" autoplay playsinline muted></video>
         </div>
 
-        <div class="metrics">
-            <span class="bpm-badge" id="bpm">BPM: --</span>
-        </div>
         <p id="status">Ready.</p>
     </div>
 
