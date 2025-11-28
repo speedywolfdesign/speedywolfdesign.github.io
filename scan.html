@@ -146,32 +146,15 @@
             margin: 12px 0 16px 0;
             position: relative;
         }
-        .heart-shape {
-            position: relative;
-            width: 200px;
+        .heart-svg {
+            width: 220px;
             height: 200px;
-            transform: rotate(-45deg);
-            background: radial-gradient(circle at 30% 30%, #ff89c2 0%, #ff2c78 45%, #b90b4b 100%);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(255, 44, 120, 0.35), inset 0 0 0 4px rgba(255,255,255,0.12);
         }
-        .heart-shape:before,
-        .heart-shape:after {
-            content: "";
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: inherit;
-            border-radius: 50%;
-            box-shadow: inherit;
-        }
-        .heart-shape:before {
-            top: -100px;
-            left: 0;
-        }
-        .heart-shape:after {
-            left: 100px;
-            top: 0;
+        .heart-svg path {
+            fill: url(#heartGradient);
+            stroke: rgba(255,255,255,0.12);
+            stroke-width: 4;
+            filter: drop-shadow(0 20px 40px rgba(255, 44, 120, 0.35));
         }
         .heart-value {
             position: absolute;
@@ -232,13 +215,8 @@
                 padding: 22px 18px 26px 18px;
                 margin: 0 8px;
             }
-            .heart-shape {
-                width: 190px;
-                height: 190px;
-            }
-            .heart-shape:before,
-            .heart-shape:after {
-                width: 190px;
+            .heart-svg {
+                width: 210px;
                 height: 190px;
             }
             .heart-value .num {
@@ -349,7 +327,16 @@
     <div id="resultOverlay" class="result-overlay" aria-hidden="true">
         <div class="result-modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
             <div class="heart-hero">
-                <div class="heart-shape"></div>
+                <svg class="heart-svg" viewBox="0 0 256 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                    <defs>
+                        <radialGradient id="heartGradient" cx="30%" cy="30%" r="80%">
+                            <stop offset="0%" stop-color="#ff89c2"/>
+                            <stop offset="45%" stop-color="#ff2c78"/>
+                            <stop offset="100%" stop-color="#b90b4b"/>
+                        </radialGradient>
+                    </defs>
+                    <path d="M128 216c-5.4 0-10.7-2-14.8-6L34 132.8C8.6 107.4 8.6 66.2 34 40.8 59.4 15.4 100.6 15.4 126 40.8l2 2 2-2c25.4-25.4 66.6-25.4 92 0 25.4 25.4 25.4 66.6 0 92L142.8 210c-4 4-9.4 6-14.8 6z"/>
+                </svg>
                 <div class="heart-value">
                     <div id="resultTitle" class="num">--</div>
                     <div class="unit">BPM</div>
