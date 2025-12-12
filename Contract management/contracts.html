@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contracts • Contract Management Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#eef2ff',
+                100: '#e0e7ff',
+                200: '#c7d2fe',
+                300: '#a5b4fc',
+                400: '#818cf8',
+                500: '#6366f1',
+                600: '#4f46e5',
+                700: '#4338ca',
+                800: '#3730a3',
+                900: '#312e81'
+              }
+            },
+            fontFamily: {
+              sans: [
+                'Inter',
+                'ui-sans-serif',
+                'system-ui',
+                '-apple-system',
+                'Segoe UI',
+                'Roboto',
+                'Helvetica Neue',
+                'Arial',
+                'Noto Sans',
+                'Apple Color Emoji',
+                'Segoe UI Emoji'
+              ]
+            }
+          }
+        }
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body class="antialiased bg-gray-50 text-gray-900">
+    <!-- Top navbar -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-200">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-14 items-center justify-between">
+          <div class="flex items-center gap-3">
+            <a href="projects.html" class="flex items-center gap-2">
+              <span class="inline-flex h-8 w-8 items-center justify-center rounded bg-brand-600 text-white font-semibold">CM</span>
+              <span class="hidden sm:inline text-sm font-semibold tracking-tight">Contract Center</span>
+            </a>
+          </div>
+          <nav class="hidden md:flex items-center gap-4 text-sm">
+            <a class="text-gray-600 hover:text-gray-900" href="projects.html">Projects</a>
+          </nav>
+          <div class="flex items-center gap-2">
+            <div class="relative hidden sm:block">
+              <button id="globalCreateBtn" class="inline-flex items-center gap-2 rounded-md bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13 11V3h-2v8H3v2h8v8h2v-8h8v-2h-8Z"/>
+                </svg>
+                Create
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5H7z"/></svg>
+              </button>
+              <div id="globalCreateMenu" class="absolute right-0 mt-2 hidden w-56 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg z-50">
+                <!-- <a id="createProjectOption" href="projects.html" class="block px-3 py-2 text-sm hover:bg-gray-50">Project</a> -->
+                <a id="createTrendOption" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Trend</a>
+                <a id="createChangeOption" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Change order</a>
+              </div>
+            </div>
+            <button class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">IM</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex gap-6">
+        <!-- Sidebar (compact static) -->
+        <aside class="hidden lg:block w-60 shrink-0">
+          <nav class="rounded-lg border border-gray-200 bg-white">
+            <ul class="px-1 py-2">
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Project Home</a></li>
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Cost</a></li>
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Field Management</a></li>
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Procurement</a></li>
+              <li><a class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900" href="#"><span class="h-4 w-4 rounded bg-white"></span>Contracts</a></li>
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Invoices</a></li>
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Change Management</a></li>
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Reports</a></li>
+              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Drive</a></li>
+            </ul>
+          </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1">
+          <!-- Breadcrumb -->
+          <div class="text-xs text-gray-500">
+            <nav class="flex items-center gap-2">
+              <a href="projects.html" class="hover:underline">Projects</a>
+              <span>/</span>
+              <span id="crumbProject" class="truncate max-w-[240px]">Cisco Systems...</span>
+            </nav>
+          </div>
+
+          <div class="mt-2 flex items-center justify-between">
+            <h1 class="text-xl font-semibold tracking-tight">Contracts</h1>
+          </div>
+
+          <!-- Stats -->
+          <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div class="rounded-lg border border-gray-200 bg-white p-4">
+              <div class="text-xs text-gray-500">Total contracts</div>
+              <div class="mt-1 text-lg font-semibold">999</div>
+            </div>
+            <div class="rounded-lg border border-gray-200 bg-white p-4">
+              <div class="text-xs text-gray-500">Active contracts</div>
+              <div class="mt-1 text-lg font-semibold">999</div>
+            </div>
+            <div class="rounded-lg border border-gray-200 bg-white p-4">
+              <div class="text-xs text-gray-500">Closed contracts</div>
+              <div class="mt-1 text-lg font-semibold">999</div>
+            </div>
+            <div class="rounded-lg border border-gray-200 bg-white p-4">
+              <div class="text-xs text-gray-500">Over dew</div>
+              <div class="mt-1 text-lg font-semibold">999</div>
+            </div>
+            <div class="rounded-lg border border-gray-200 bg-white p-4">
+              <div class="text-xs text-gray-500">Completed</div>
+              <div class="mt-1 text-lg font-semibold">999</div>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="mt-4 flex items-center justify-between">
+            <div class="relative">
+              <button id="createBtn" class="inline-flex items-center gap-2 rounded-md bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                Create
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 10l5 5 5-5H7z"/>
+                </svg>
+              </button>
+              <div id="createMenu" class="absolute left-0 mt-2 hidden w-56 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg z-50">
+                <a id="createNewContractLink" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Create new contract</a>
+                <a id="importPWLink" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Import from ProcureWare</a>
+                <a id="useG2Link" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Use G2 contract</a>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="hidden sm:flex items-center rounded-md border border-gray-200 bg-white">
+                <button id="openContractSettingsBtn" class="p-2 text-gray-600 hover:bg-gray-50" title="Contract settings">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.936a7.97 7.97 0 0 0 .06-.936c0-.318-.02-.63-.06-.936l2.037-1.582a.5.5 0 0 0 .121-.652l-1.93-3.342a.5.5 0 0 0-.607-.22l-2.398.96a8.042 8.042 0 0 0-1.617-.936l-.363-2.54A.5.5 0 0 0 13.94 1h-3.88a.5.5 0 0 0-.494.422l-.363 2.54a8.042 8.042 0 0 0-1.617.936l-2.398-.96a.5.5 0 0 0-.607.22L.65 7.96a.5.5 0 0 0 .121.652l2.037 1.582c-.04.306-.06.618-.06.936s.02.63.06.936L.77 13.65a.5.5 0 0 0-.121.652l1.93 3.342a.5.5 0 0 0 .607.22l2.398-.96c.5.36 1.045.67 1.617.936l.363 2.54a.5.5 0 0 0 .494.422h3.88a.5.5 0 0 0 .494-.422l.363-2.54c.572-.266 1.117-.575 1.617-.936l2.398.96a.5.5 0 0 0 .607-.22l1.93-3.342a.5.5 0 0 0-.121-.652l-2.037-1.582ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/>
+                  </svg>
+                </button>
+                <button class="border-l border-gray-200 p-2 text-gray-600 hover:bg-gray-50" title="Layout">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 5h16v4H4V5Zm0 6h10v8H4v-8Zm12 0h4v8h-4v-8Z"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="relative w-full max-w-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M10 3a7 7 0 015.292 11.707l4 4-1.414 1.414-4-4A7 7 0 1110 3Zm0 2a5 5 0 100 10 5 5 0 000-10Z"/>
+                </svg>
+                <input id="contractSearch" type="text" placeholder="Search..." class="w-full rounded-md border border-gray-300 pl-8 pr-3 py-2 text-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="mt-4 overflow-x-auto rounded-lg border border-gray-200 bg-white">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left font-medium text-gray-600">Description</th>
+                  <th class="px-4 py-3 text-left font-medium text-gray-600">Project ID</th>
+                  <th class="px-4 py-3 text-left font-medium text-gray-600">Title</th>
+                  <th class="px-4 py-3 text-left font-medium text-gray-600">Bids received</th>
+                  <th class="px-4 py-3 text-left font-medium text-gray-600">Status</th>
+                  <th class="px-4 py-3 text-left font-medium text-gray-600">Source</th>
+                </tr>
+              </thead>
+              <tbody id="contractsTableBody" class="divide-y divide-gray-100">
+                <!-- Empty state -->
+                <tr>
+                  <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-500">No contracts yet. Use the Create button to add one.</td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Pagination -->
+            <div class="flex items-center justify-between px-4 py-3 sm:px-6 border-t border-gray-200">
+              <div class="text-sm text-gray-600">
+                <span id="paginationInfo">0–0 of 0</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <label class="text-sm text-gray-700 flex items-center gap-2">
+                  Rows per page
+                  <select id="pageSizeSelect" class="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                </label>
+                <div class="flex items-center gap-1">
+                  <button id="pagePrev" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-gray-50" aria-label="Previous page">‹</button>
+                  <button id="pageNext" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-gray-50" aria-label="Next page">›</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Create Contract Modal -->
+    <div id="newContractModal" class="fixed inset-0 z-50 hidden">
+      <div id="newContractOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div class="relative mx-auto flex h-full items-start justify-center p-4 sm:p-6">
+        <div class="mt-4 w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl ring-1 ring-black/5">
+          <!-- Modal header -->
+          <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-6">
+            <h2 id="newContractTitle" class="text-base font-semibold">Create contract</h2>
+            <button id="newContractClose" class="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <span class="sr-only">Close</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Modal body -->
+          <div class="max-h-[70vh] overflow-y-auto px-4 py-4 sm:px-6">
+            <form id="newContractForm" class="space-y-6">
+              <!-- Top quick fields -->
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="relative">
+                  <label class="mb-1 block text-xs font-medium text-gray-700">Contract ID</label>
+                  <input data-required="true" name="contractId" type="text" placeholder="CID 001" class="peer w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+                  <span class="pointer-events-none absolute right-2 top-8 hidden text-red-500 peer-[aria-invalid=true]:inline">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 .5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm0 5a1 1 0 0 1 .993.883L11 6.5v5a1 1 0 0 1-1.993.117L9 11.5v-5a1 1 0 0 1 1-1Zm0 9a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"/></svg>
+                  </span>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-gray-700">Project Name</label>
+                  <select data-required="true" name="projectName" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option value="">Select project</option>
+                    <option>Green Initiative</option>
+                    <option>PRISM Lem Manager</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-gray-700">Contract type</label>
+                  <select data-required="true" name="contractType" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option value="">Select type</option>
+                    <option>NEC</option>
+                    <option>G2</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-gray-700">Contractor</label>
+                  <select data-required="true" name="contractor" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option value="">Select contractor</option>
+                    <option>Contractor 01</option>
+                    <option>Contractor 02</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-gray-700">Title</label>
+                  <input data-required="true" name="title" type="text" placeholder="Data here" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-gray-700">Start date</label>
+                  <input data-required="true" name="startDate" type="date" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-gray-700">End date</label>
+                  <input data-required="true" name="endDate" type="date" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-gray-700">Currency</label>
+                  <select name="currency" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option>USD</option>
+                    <option>EUR</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Attachments -->
+              <div>
+                <label class="mb-1 block text-xs font-medium text-gray-700">Attachments</label>
+                <div class="flex h-28 w-full items-center justify-center rounded-md border-2 border-dashed border-gray-300">
+                  <div class="text-center">
+                    <p class="text-xs text-gray-500">Drag and drop file from computer or select</p>
+                    <div class="mt-2 flex justify-center gap-2">
+                      <button type="button" class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs hover:bg-gray-50">Desktop</button>
+                      <button type="button" class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs hover:bg-gray-50">Drive</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sections (collapsed look) -->
+              <details class="rounded-md border border-gray-200 bg-white" open>
+                <summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Pay</summary>
+                <div class="border-t border-gray-200 p-3">
+                  <div id="payItemsContainer" class="space-y-3">
+                    <!-- One default row will be ensured by JS -->
+                    <div class="pay-row grid grid-cols-1 gap-3 sm:grid-cols-6 items-end">
+                      <div class="sm:col-span-4">
+                        <label class="mb-1 block text-xs font-medium text-gray-700">Item</label>
+                        <input name="payItem" type="text" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+                      </div>
+                      <div class="sm:col-span-1">
+                        <label class="mb-1 block text-xs font-medium text-gray-700">Quantity</label>
+                        <input name="payQty" type="number" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+                      </div>
+                      <div class="sm:col-span-1 flex items-end">
+                        <button type="button" class="remove-pay inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-xs hover:bg-gray-50">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/></svg>
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <button id="addPayBtn" type="button" class="mt-3 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs hover:bg-gray-50">Add</button>
+                </div>
+              </details>
+
+              <details class="rounded-md border border-gray-200 bg-white">
+                <summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Project manager</summary>
+                <div class="border-t border-gray-200 p-3">
+                  <select class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option>Lily Carter</option>
+                    <option>Alex Lee</option>
+                  </select>
+                </div>
+              </details>
+
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Contacts</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Change order and modifications</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Activities</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Company contacts</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Insurance</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Notes & attachments</summary></details>
+            </form>
+            <!-- Read-only view -->
+            <div id="contractView" class="hidden space-y-6">
+              <!-- Summary grid -->
+              <div class="rounded-lg border border-gray-200 bg-white p-4">
+                <div class="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-3">
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Number</div>
+                    <div id="viewNumber" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Company</div>
+                    <div id="viewCompany" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Dep participation goal</div>
+                    <div id="viewDepGoal" class="text-sm text-gray-900">—</div>
+                  </div>
+
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Title</div>
+                    <div id="viewTitle" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Start date</div>
+                    <div id="viewStartDate" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Federally funded</div>
+                    <div id="viewFederallyFunded" class="text-sm text-gray-900">—</div>
+                  </div>
+
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Usergroup</div>
+                    <div id="viewUsergroup" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">End date</div>
+                    <div id="viewEndDate" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Billing address</div>
+                    <div id="viewBillingAddress" class="text-sm text-gray-900">—</div>
+                  </div>
+
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">External access</div>
+                    <div id="viewExternalAccess" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Renewal terms</div>
+                    <div id="viewRenewalTerms" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Shipping address</div>
+                    <div id="viewShippingAddress" class="text-sm text-gray-900">—</div>
+                  </div>
+
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Contract type</div>
+                    <div id="viewContractType" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Currency</div>
+                    <div id="viewCurrency" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Related bid</div>
+                    <div id="viewRelatedBid" class="text-sm text-gray-900">—</div>
+                  </div>
+
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Contract status</div>
+                    <div id="viewContractStatus" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Starting value</div>
+                    <div id="viewStartingValue" class="text-sm text-gray-900">—</div>
+                  </div>
+                  <div>
+                    <div class="mb-1 text-xs font-medium text-gray-700">Disable alerts</div>
+                    <div id="viewDisableAlerts" class="text-sm text-gray-900">—</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pay section -->
+              <details class="rounded-md border border-gray-200 bg-white" open>
+                <summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Pay</summary>
+                <div class="border-t border-gray-200">
+                  <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th class="px-4 py-2 text-left font-medium text-gray-600">Item</th>
+                        <th class="px-4 py-2 text-right font-medium text-gray-600">Quantity</th>
+                      </tr>
+                    </thead>
+                    <tbody id="viewPayBody" class="divide-y divide-gray-100">
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <!-- Project manager -->
+              <details class="rounded-md border border-gray-200 bg-white" open>
+                <summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Project manager</summary>
+                <div class="border-t border-gray-200 p-3">
+                  <div id="viewProjectManager" class="text-sm text-gray-900">—</div>
+                </div>
+              </details>
+
+              <!-- Other collapsed sections -->
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Contacts</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Change order and modifications</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Activities</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Company contacts</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Insurance</summary></details>
+              <details class="rounded-md border border-gray-200 bg-white"><summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Notes & attachments</summary></details>
+            </div>
+          </div>
+          <!-- Modal footer -->
+          <div class="flex items-center justify-between gap-3 border-t border-gray-200 px-4 py-3 sm:px-6">
+            <button id="newContractCloseFooter" class="text-sm text-gray-700 hover:text-gray-900">Close</button>
+            <div id="modalActions" class="flex items-center gap-2">
+              <button id="saveDraftBtn" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50">Save as draft</button>
+              <button id="sendContractBtn" class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="pointer-events-none fixed bottom-4 right-4 z-[60] space-y-2"></div>
+
+    <!-- Workflow confirmation modal -->
+    <div id="workflowModal" class="fixed inset-0 z-[70] hidden">
+      <div id="workflowOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div class="relative mx-auto flex h-full items-start justify-center p-4 sm:p-6">
+        <div class="mt-8 w-full max-w-3xl overflow-hidden rounded-lg bg-white shadow-xl ring-1 ring-black/5">
+          <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-6">
+            <h3 class="text-base font-semibold">Workflow</h3>
+            <button id="workflowClose" class="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+              <span class="sr-only">Close</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="px-4 py-4 sm:px-6">
+            <p class="text-sm text-gray-600">Your submission will go through the following workflow</p>
+
+            <!-- Reviewers -->
+            <section class="mt-4 rounded-lg border border-gray-200 bg-gray-50">
+              <div class="flex items-center justify-between px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-200 text-[10px]">⎇</span>
+                  <h4 class="text-sm font-semibold">Reviewers</h4>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-medium text-gray-900">2 reviewer(s)</div>
+                  <div class="text-xs text-gray-500">All must acknowledge</div>
+                </div>
+              </div>
+              <div class="border-t border-gray-200 px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2">
+                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">LP</span>
+                    <span class="text-sm">Louis Parol</span>
+                  </div>
+                  <span class="text-gray-400">→</span>
+                  <div class="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2">
+                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">LB</span>
+                    <span class="text-sm">Louis B</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Contractor acceptance -->
+            <section class="mt-4 rounded-lg border border-gray-200 bg-gray-50">
+              <div class="flex items-center justify-between px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-200 text-[10px]">⎇</span>
+                  <h4 class="text-sm font-semibold">Contractor acceptance</h4>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-medium text-gray-900">1 acceptor(s)</div>
+                  <div class="text-xs text-gray-500">1 must accept</div>
+                </div>
+              </div>
+              <div class="border-t border-gray-200 px-4 py-3">
+                <div class="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2">
+                  <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">JB</span>
+                  <span class="text-sm">Jack Black</span>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+            <button id="workflowBack" class="text-sm text-brand-700 hover:underline">Go back</button>
+            <button id="workflowSendBtn" class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import from ProcureWare modal -->
+    <div id="importPWModal" class="fixed inset-0 z-[70] hidden">
+      <div id="importPWOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div class="relative mx-auto flex h-full items-start justify-center p-4 sm:p-6">
+        <div class="mt-8 w-full max-w-2xl overflow-hidden rounded-lg bg-white shadow-xl ring-1 ring-black/5">
+          <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-6">
+            <h3 class="text-base font-semibold">Import from ProcureWare</h3>
+            <button id="importPWClose" class="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+              <span class="sr-only">Close</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/></svg>
+            </button>
+          </div>
+          <div class="px-4 py-4 sm:px-6">
+            <p class="text-sm text-gray-600">Select bid packages to import as contracts for this project.</p>
+            <div class="mt-3 flex items-center justify-between gap-3">
+              <div class="relative w-full max-w-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M10 3a7 7 0 015.292 11.707l4 4-1.414 1.414-4-4A7 7 0 1110 3Zm0 2a5 5 0 100 10 5 5 0 000-10Z"/>
+                </svg>
+                <input id="importPWSearch" type="text" placeholder="Search packages" class="w-full rounded-md border border-gray-300 pl-8 pr-3 py-2 text-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+              </div>
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input id="importPWSelectAll" type="checkbox" class="rounded border-gray-300" />
+                <span>Select all</span>
+              </label>
+            </div>
+            <form id="importPWForm" class="mt-3 max-h-72 overflow-y-auto divide-y divide-gray-100 border border-gray-200 rounded-md">
+              <div id="importPWList" class="divide-y divide-gray-100">
+                <!-- dynamically rendered -->
+              </div>
+            </form>
+          </div>
+          <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+            <button id="importPWCancel" class="text-sm text-gray-700 hover:text-gray-900">Cancel</button>
+            <button id="importPWConfirm" class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">Import</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Settings Modal -->
+    <div id="contractSettingsModal" class="fixed inset-0 z-[70] hidden">
+      <div id="contractSettingsOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div class="relative mx-auto flex h-full items-start justify-center p-4 sm:p-6">
+        <div class="mt-8 w-full max-w-xl overflow-hidden rounded-lg bg-white shadow-xl ring-1 ring-black/5">
+          <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-6">
+            <h3 class="text-base font-semibold">Contract settings</h3>
+            <button id="contractSettingsClose" class="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+              <span class="sr-only">Close</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/></svg>
+            </button>
+          </div>
+          <div class="px-4 py-4 sm:px-6">
+            <p class="text-sm text-gray-600">Update allowed ways to create contracts for <span class="font-medium" id="csProjectName">this project</span>.</p>
+            <form id="contractSettingsForm" class="mt-3 space-y-3">
+              <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded bg-brand-600 text-xs font-semibold text-white">C</span>
+                  <span class="text-sm">Create new contract</span>
+                </div>
+                <input id="csOptCreate" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
+              </label>
+              <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-orange-600">●</span>
+                  <span class="text-sm">Use ProcureWare</span>
+                </div>
+                <input id="csOptPW" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
+              </label>
+              <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-300">✉</span>
+                  <span class="text-sm">Use G2 contracts (control centre)</span>
+                </div>
+                <input id="csOptG2" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
+              </label>
+            </form>
+          </div>
+          <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+            <button id="contractSettingsCancel" class="text-sm text-gray-700 hover:text-gray-900">Cancel</button>
+            <button id="contractSettingsSave" class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="assets/js/contracts.js"></script>
+  </body>
+  </html>
+
+
