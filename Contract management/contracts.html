@@ -54,8 +54,8 @@
         <div class="flex h-14 items-center justify-between">
           <div class="flex items-center gap-3">
             <a href="projects.html" class="flex items-center gap-2">
-              <span class="inline-flex h-8 w-8 items-center justify-center rounded bg-brand-600 text-white font-semibold">CM</span>
-              <span class="hidden sm:inline text-sm font-semibold tracking-tight">Contract Center</span>
+              <span class="inline-flex h-8 w-8 items-center justify-center rounded bg-brand-600 text-white font-semibold">C</span>
+              <span class="hidden sm:inline text-sm font-semibold tracking-tight">Contract</span>
             </a>
           </div>
           <nav class="hidden md:flex items-center gap-4 text-sm">
@@ -229,13 +229,19 @@
         <div class="mt-4 w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl ring-1 ring-black/5">
           <!-- Modal header -->
           <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-6">
-            <h2 id="newContractTitle" class="text-base font-semibold">Create contract</h2>
-            <button id="newContractClose" class="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
-              <span class="sr-only">Close</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/>
-              </svg>
-            </button>
+            <div class="flex items-center gap-2">
+              <h2 id="newContractTitle" class="text-base font-semibold">Create contract</h2>
+              <span id="contractStatusBadge" class="hidden"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="editContractBtn" class="hidden rounded-md border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50">Edit</button>
+              <button id="newContractClose" class="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <span class="sr-only">Close</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/>
+                </svg>
+              </button>
+            </div>
           </div>
           <!-- Modal body -->
           <div class="max-h-[70vh] overflow-y-auto px-4 py-4 sm:px-6">
@@ -262,7 +268,8 @@
                   <select data-required="true" name="contractType" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
                     <option value="">Select type</option>
                     <option>NEC</option>
-                    <option>G2</option>
+                    <option>FIDIC</option>
+                    <option>Other</option>
                   </select>
                 </div>
                 <div>
@@ -503,7 +510,7 @@
               </svg>
             </button>
           </div>
-          <div class="px-4 py-4 sm:px-6">
+          <div id="workflowBodyContent" class="px-4 py-4 sm:px-6">
             <p class="text-sm text-gray-600">Your submission will go through the following workflow</p>
 
             <!-- Reviewers -->
@@ -519,16 +526,24 @@
                 </div>
               </div>
               <div class="border-t border-gray-200 px-4 py-3">
-                <div class="flex items-center gap-3">
-                  <div class="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2">
-                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">LP</span>
-                    <span class="text-sm">Louis Parol</span>
+                <div class="flex items-center justify-between">
+                  <div id="reviewersChips" class="flex items-center gap-3 overflow-x-auto whitespace-nowrap pr-2"></div>
+                  <div class="flex items-center gap-1">
+                    <button id="saveReviewersBtn" class="hidden rounded-md border border-gray-300 bg-white p-1" title="Save">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                      </path></svg>
+                    </button>
+                    <button id="cancelReviewersBtn" class="hidden rounded-md border border-gray-300 bg-white p-1" title="Cancel">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                      </path></svg>
+                    </button>
+                    <button id="editReviewersBtn" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50">Edit</button>
                   </div>
-                  <span class="text-gray-400">→</span>
-                  <div class="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2">
-                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">LB</span>
-                    <span class="text-sm">Louis B</span>
-                  </div>
+                </div>
+                <div id="editReviewersPanel" class="mt-2 hidden rounded-md border border-gray-200 bg-white p-2">
+                  <div id="reviewersOptions" class="grid grid-cols-2 gap-2"></div>
                 </div>
               </div>
             </section>
@@ -546,9 +561,24 @@
                 </div>
               </div>
               <div class="border-t border-gray-200 px-4 py-3">
-                <div class="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2">
-                  <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">JB</span>
-                  <span class="text-sm">Jack Black</span>
+                <div class="flex items-center justify-between">
+                  <div id="acceptanceChips" class="flex items-center gap-2 overflow-x-auto whitespace-nowrap pr-2"></div>
+                  <div class="flex items-center gap-1">
+                    <button id="saveAcceptanceBtn" class="hidden rounded-md border border-gray-300 bg-white p-1" title="Save">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                      </path></svg>
+                    </button>
+                    <button id="cancelAcceptanceBtn" class="hidden rounded-md border border-gray-300 bg-white p-1" title="Cancel">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                      </path></svg>
+                    </button>
+                    <button id="editAcceptanceBtn" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50">Edit</button>
+                  </div>
+                </div>
+                <div id="editAcceptancePanel" class="mt-2 hidden rounded-md border border-gray-200 bg-white p-2">
+                  <div id="acceptanceOptions" class="grid grid-cols-2 gap-2"></div>
                 </div>
               </div>
             </section>

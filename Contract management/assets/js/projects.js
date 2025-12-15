@@ -237,6 +237,12 @@
       list.push(proj);
       saveProjects(list);
       appendProjectRow(proj);
+      // If G2 contracts are enabled for this project, seed import on contracts page
+      if (useG2 && title) {
+        try {
+          localStorage.setItem(`cm:seedG2For:${title}`, 'true');
+        } catch {}
+      }
       closeProjectModal();
       createProjectForm.reset();
     });

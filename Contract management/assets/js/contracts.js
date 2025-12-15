@@ -21,6 +21,11 @@
   const modalTitle = document.getElementById('newContractTitle');
   const contractView = document.getElementById('contractView');
   const modalActions = document.getElementById('modalActions');
+  const editContractBtn = document.getElementById('editContractBtn');
+  const statusBadge = document.getElementById('contractStatusBadge');
+  const workflowBodyContent = document.getElementById('workflowBodyContent');
+  let editingRecordId = null;
+  let lastViewedRecord = null;
   // Workflow modal
   const workflowModal = document.getElementById('workflowModal');
   const workflowOverlay = document.getElementById('workflowOverlay');
@@ -28,6 +33,7 @@
   const workflowBack = document.getElementById('workflowBack');
   const workflowSendBtn = document.getElementById('workflowSendBtn');
   let pendingRecord = null;
+  let pendingIsUpdate = false;
 
   // Pay items
   const payItemsContainer = document.getElementById('payItemsContainer');
@@ -123,6 +129,7 @@
   function closeModal() {
     modal.classList.add('hidden');
     document.body.classList.remove('overflow-hidden');
+    hideStatusTooltip();
   }
   function openWorkflowModal() {
     if (!workflowModal) return;
@@ -212,11 +219,18 @@
   function statusPill(status) {
     const span = document.createElement('span');
     span.textContent = status;
-    span.className = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ' +
-      (status === 'Submitted'
+    span.className =
+      'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ' +
+      (status === 'Active'
         ? 'bg-green-50 text-green-700 ring-green-600/20'
+        : status === 'In review'
+        ? 'bg-orange-50 text-orange-700 ring-orange-600/20'
+        : status === 'In acceptance'
+        ? 'bg-orange-100 text-orange-800 ring-orange-600/30'
         : status === 'Draft'
         ? 'bg-gray-50 text-gray-700 ring-gray-400/30'
+        : status === 'Closed'
+        ? 'bg-gray-100 text-gray-700 ring-gray-400/40'
         : 'bg-blue-50 text-blue-700 ring-blue-600/20');
     return span;
   }
@@ -336,7 +350,36 @@
     if (pagePrevBtn) pagePrevBtn.disabled = currentPage <= 1;
     if (pageNextBtn) pageNextBtn.disabled = currentPage >= Math.max(1, Math.ceil(total / pageSize));
   }
-  renderContracts(contracts);
+  // If a seed import from G2 was requested (e.g., on project creation), show loader and import 10
+  (function maybeSeedG2() {
+    const seedKey = `cm:seedG2For:${project || 'default'}`;
+    const shouldSeed = localStorage.getItem(seedKey) === 'true';
+    if (shouldSeed) {
+      renderImportSkeleton(10);
+      setTimeout(() => {
+        const now = Date.now();
+        const imported = Array.from({ length: 10 }, (_, i) => ({
+          id: now + i,
+          createdAt: now + i,
+          description: 'G2',
+          projectId: 'G2-' + Math.floor(Math.random() * 1000),
+          title: `Imported from G2 #${i + 1}`,
+          bidsReceived: 0,
+          status: Math.random() < 0.5 ? 'Active' : 'Closed',
+          source: 'G2'
+        }));
+        imported.forEach((r) => contracts.push(r));
+        saveContracts(contracts);
+        renderContracts(contracts);
+        localStorage.removeItem(seedKey);
+        showToast('Imported 10 contract(s) from G2.', 'View', () => {
+          window.location.hash = '#g2-seeded';
+        });
+      }, 1200);
+    } else {
+      renderContracts(contracts);
+    }
+  })();
 
   // Contract settings modal (toolbar settings button)
   const openCSBtn = document.getElementById('openContractSettingsBtn');
@@ -349,12 +392,149 @@
   const csOptPW = document.getElementById('csOptPW');
   const csOptG2 = document.getElementById('csOptG2');
   const csProjectName = document.getElementById('csProjectName');
+  let prevCSSettings = null;
+
+  // Workflow reviewers/acceptors editable lists
+  const reviewersChipsEl = document.getElementById('reviewersChips');
+  const acceptanceChipsEl = document.getElementById('acceptanceChips');
+  const editReviewersBtn = document.getElementById('editReviewersBtn');
+  const editAcceptanceBtn = document.getElementById('editAcceptanceBtn');
+  const editReviewersPanel = document.getElementById('editReviewersPanel');
+  const editAcceptancePanel = document.getElementById('editAcceptancePanel');
+  const reviewersOptionsEl = document.getElementById('reviewersOptions');
+  const acceptanceOptionsEl = document.getElementById('acceptanceOptions');
+
+  const ALL_USERS = [
+    { id: 'lp', name: 'Louis Parol', initials: 'LP' },
+    { id: 'lb', name: 'Louis B', initials: 'LB' },
+    { id: 'jb', name: 'Jack Black', initials: 'JB' },
+    { id: 'im', name: 'Iara Moran', initials: 'IM' },
+    { id: 'js', name: 'Juan Silva', initials: 'JS' },
+    { id: 'al', name: 'Alex Lee', initials: 'AL' }
+  ];
+  const usersById = Object.fromEntries(ALL_USERS.map((u) => [u.id, u]));
+  let workflowReviewers = ['lp', 'lb'];
+  let workflowAcceptance = ['jb'];
+
+  function renderChips(container, ids) {
+    if (!container) return;
+    container.innerHTML = '';
+    ids.forEach((id, idx) => {
+      const u = usersById[id];
+      if (!u) return;
+      const chip = document.createElement('div');
+      chip.className = 'inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2';
+      const avatar = document.createElement('span');
+      avatar.className = 'inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white';
+      avatar.textContent = u.initials;
+      const name = document.createElement('span');
+      name.className = 'text-sm';
+      name.textContent = u.name;
+      chip.appendChild(avatar);
+      chip.appendChild(name);
+      container.appendChild(chip);
+      if (container === reviewersChipsEl && idx < ids.length - 1) {
+        const arrow = document.createElement('span');
+        arrow.className = 'text-gray-400';
+        arrow.textContent = '→';
+        container.appendChild(arrow);
+      }
+    });
+  }
+  function renderOptions(container, ids, onToggle) {
+    if (!container) return;
+    container.innerHTML = '';
+    ALL_USERS.forEach((u) => {
+      const row = document.createElement('label');
+      row.className = 'flex items-center gap-2 text-sm';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'rounded border-gray-300';
+      cb.checked = ids.includes(u.id);
+      cb.addEventListener('change', () => onToggle(u.id, cb.checked));
+      const span = document.createElement('span');
+      span.textContent = `${u.initials} — ${u.name}`;
+      row.appendChild(cb);
+      row.appendChild(span);
+      container.appendChild(row);
+    });
+  }
+  // initial render + edit/save/cancel UX
+  renderChips(reviewersChipsEl, workflowReviewers);
+  renderChips(acceptanceChipsEl, workflowAcceptance);
+  const saveReviewersBtn = document.getElementById('saveReviewersBtn');
+  const cancelReviewersBtn = document.getElementById('cancelReviewersBtn');
+  const saveAcceptanceBtn = document.getElementById('saveAcceptanceBtn');
+  const cancelAcceptanceBtn = document.getElementById('cancelAcceptanceBtn');
+  let prevReviewers = [];
+  let prevAcceptance = [];
+
+  function enterEditReviewers() {
+    prevReviewers = Array.from(workflowReviewers);
+    if (editReviewersPanel) {
+      editReviewersPanel.classList.remove('hidden');
+      renderOptions(reviewersOptionsEl, workflowReviewers, (id, checked) => {
+        const set = new Set(workflowReviewers);
+        if (checked) set.add(id);
+        else set.delete(id);
+        workflowReviewers = Array.from(set);
+        renderChips(reviewersChipsEl, workflowReviewers);
+      });
+    }
+    if (editReviewersBtn) editReviewersBtn.classList.add('hidden');
+    if (saveReviewersBtn) saveReviewersBtn.classList.remove('hidden');
+    if (cancelReviewersBtn) cancelReviewersBtn.classList.remove('hidden');
+  }
+  function exitEditReviewers(apply) {
+    if (!apply) {
+      workflowReviewers = Array.from(prevReviewers);
+      renderChips(reviewersChipsEl, workflowReviewers);
+    }
+    if (editReviewersPanel) editReviewersPanel.classList.add('hidden');
+    if (saveReviewersBtn) saveReviewersBtn.classList.add('hidden');
+    if (cancelReviewersBtn) cancelReviewersBtn.classList.add('hidden');
+    if (editReviewersBtn) editReviewersBtn.classList.remove('hidden');
+  }
+  if (editReviewersBtn) editReviewersBtn.addEventListener('click', () => enterEditReviewers());
+  if (saveReviewersBtn) saveReviewersBtn.addEventListener('click', () => exitEditReviewers(true));
+  if (cancelReviewersBtn) cancelReviewersBtn.addEventListener('click', () => exitEditReviewers(false));
+
+  function enterEditAcceptance() {
+    prevAcceptance = Array.from(workflowAcceptance);
+    if (editAcceptancePanel) {
+      editAcceptancePanel.classList.remove('hidden');
+      renderOptions(acceptanceOptionsEl, workflowAcceptance, (id, checked) => {
+        const set = new Set(workflowAcceptance);
+        if (checked) set.add(id);
+        else set.delete(id);
+        workflowAcceptance = Array.from(set);
+        renderChips(acceptanceChipsEl, workflowAcceptance);
+      });
+    }
+    if (editAcceptanceBtn) editAcceptanceBtn.classList.add('hidden');
+    if (saveAcceptanceBtn) saveAcceptanceBtn.classList.remove('hidden');
+    if (cancelAcceptanceBtn) cancelAcceptanceBtn.classList.remove('hidden');
+  }
+  function exitEditAcceptance(apply) {
+    if (!apply) {
+      workflowAcceptance = Array.from(prevAcceptance);
+      renderChips(acceptanceChipsEl, workflowAcceptance);
+    }
+    if (editAcceptancePanel) editAcceptancePanel.classList.add('hidden');
+    if (saveAcceptanceBtn) saveAcceptanceBtn.classList.add('hidden');
+    if (cancelAcceptanceBtn) cancelAcceptanceBtn.classList.add('hidden');
+    if (editAcceptanceBtn) editAcceptanceBtn.classList.remove('hidden');
+  }
+  if (editAcceptanceBtn) editAcceptanceBtn.addEventListener('click', () => enterEditAcceptance());
+  if (saveAcceptanceBtn) saveAcceptanceBtn.addEventListener('click', () => exitEditAcceptance(true));
+  if (cancelAcceptanceBtn) cancelAcceptanceBtn.addEventListener('click', () => exitEditAcceptance(false));
 
   function openCS() {
     const currentProjectName = (crumbProject && crumbProject.textContent) ? crumbProject.textContent.trim() : project || 'This project';
     if (csProjectName) csProjectName.textContent = currentProjectName;
     // load settings for current project
     const settings = loadProjectSettings(currentProjectName) || { createNew: true, importPW: true, g2: false };
+    prevCSSettings = { ...settings };
     if (csOptCreate) csOptCreate.checked = !!settings.createNew;
     if (csOptPW) csOptPW.checked = !!settings.importPW;
     if (csOptG2) csOptG2.checked = !!settings.g2;
@@ -362,6 +542,38 @@
       csModal.classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
     }
+  }
+  // If G2 is turned OFF in settings, confirm and remove G2 contracts
+  if (csOptG2) {
+    csOptG2.addEventListener('change', () => {
+      const wasEnabled = !!(prevCSSettings && prevCSSettings.g2);
+      if (wasEnabled && !csOptG2.checked) {
+        const ok = window.confirm('Disabling G2 contracts will remove all G2-imported contracts from this project. Do you want to continue?');
+        if (!ok) {
+          // revert checkbox
+          csOptG2.checked = true;
+          return;
+        }
+        // Remove G2 contracts and re-render
+        const before = contracts.length;
+        const isG2Rec = (r) => {
+          const src = (r.source || '').toString().toLowerCase();
+          const title = (r.title || '').toString().toLowerCase();
+          const desc = (r.description || '').toString().toLowerCase();
+          return src === 'g2' || title.includes('imported from g2') || desc.includes('g2');
+        };
+        for (let i = contracts.length - 1; i >= 0; i--) {
+          if (isG2Rec(contracts[i])) {
+            contracts.splice(i, 1);
+          }
+        }
+        const removed = before - contracts.length;
+        saveContracts(contracts);
+        renderContracts(contracts);
+        showToast(`Removed ${removed} G2 contract(s).`, 'OK');
+        // keep prev settings as-is; final persistence happens on Save
+      }
+    });
   }
   function closeCS() {
     if (csModal) {
@@ -404,6 +616,29 @@
       applyCreateMenuVisibility(settings);
       closeCS();
       showToast('Contract settings updated.', 'OK');
+      // If G2 newly enabled, import 10 G2 records with loader
+      if (settings.g2 && !(prevCSSettings && prevCSSettings.g2)) {
+        renderImportSkeleton(10);
+        setTimeout(() => {
+          const now = Date.now();
+          const imported = Array.from({ length: 10 }, (_, i) => ({
+            id: now + i,
+            createdAt: now + i,
+            description: 'G2',
+            projectId: 'G2-' + Math.floor(Math.random() * 1000),
+            title: `Imported from G2 #${i + 1}`,
+            bidsReceived: 0,
+            status: Math.random() < 0.5 ? 'Active' : 'Closed',
+            source: 'G2'
+          }));
+          imported.forEach((r) => contracts.push(r));
+          saveContracts(contracts);
+          renderContracts(contracts);
+          showToast('Imported 10 contract(s) from G2.', 'View', () => {
+            window.location.hash = '#g2-enabled';
+          });
+        }, 1200);
+      }
     });
   }
 
@@ -515,23 +750,24 @@
     useG2Link.addEventListener('click', (e) => {
       e.preventDefault();
       closeMenu(createMenu);
-      // Simulate G2 import with loader and single record
-      renderImportSkeleton(6);
+      // Simulate G2 import with loader and 10 records
+      renderImportSkeleton(10);
       setTimeout(() => {
-        const rec = {
-          id: Date.now(),
-          createdAt: Date.now(),
+        const now = Date.now();
+        const imported = Array.from({ length: 10 }, (_, i) => ({
+          id: now + i,
+          createdAt: now + i,
           description: 'G2',
           projectId: 'G2-' + Math.floor(Math.random() * 1000),
-          title: 'Imported from G2',
+          title: `Imported from G2 #${i + 1}`,
           bidsReceived: 0,
           status: Math.random() < 0.5 ? 'Active' : 'Closed',
           source: 'G2'
-        };
-        contracts.push(rec);
+        }));
+        imported.forEach((r) => contracts.push(r));
         saveContracts(contracts);
         renderContracts(contracts);
-        showToast('Imported 1 contract from G2.', 'View', () => {
+        showToast('Imported 10 contract(s) from G2.', 'View', () => {
           window.location.hash = '#g2-import';
         });
       }, 1200);
@@ -647,10 +883,35 @@
     if (form) form.classList.remove('hidden');
     if (contractView) contractView.classList.add('hidden');
     if (modalActions) modalActions.classList.remove('hidden');
+    if (editContractBtn) editContractBtn.classList.add('hidden');
+    if (statusBadge) {
+      statusBadge.classList.add('hidden');
+      statusBadge.innerHTML = '';
+    }
+    if (sendBtn) sendBtn.textContent = 'Send';
+    if (saveDraftBtn) saveDraftBtn.textContent = 'Save as draft';
+    editingRecordId = null;
     ensureOnePayRow();
   }
   function enterViewMode(rec) {
     if (modalTitle) modalTitle.textContent = 'Contract details';
+    lastViewedRecord = rec;
+    editingRecordId = rec && rec.id ? rec.id : null;
+    if (editContractBtn) {
+      const isG2 = ((rec && rec.source) || '').toString().toLowerCase() === 'g2';
+      if (isG2) editContractBtn.classList.add('hidden');
+      else editContractBtn.classList.remove('hidden');
+    }
+    if (sendBtn) sendBtn.textContent = 'Send';
+    if (saveDraftBtn) saveDraftBtn.textContent = 'Save as draft';
+    // Show status badge
+    if (statusBadge) {
+      statusBadge.classList.remove('hidden');
+      statusBadge.innerHTML = '';
+      const pill = statusPill(rec.status || 'Submitted');
+      pill.classList.add('cursor-pointer');
+      statusBadge.appendChild(pill);
+    }
     if (form) form.classList.add('hidden');
     if (contractView) {
       contractView.classList.remove('hidden');
@@ -731,6 +992,51 @@
   }
 
   // Pay items logic
+  function prefillFormFromRecord(rec) {
+    if (!form || !rec) return;
+    const setVal = (sel, v) => {
+      const el = form.querySelector(sel);
+      if (el) el.value = v || '';
+    };
+    const setSelectByValueOrText = (sel, v) => {
+      const el = form.querySelector(sel);
+      if (!el || v == null) return;
+      const val = String(v);
+      // try value match
+      el.value = val;
+      if (el.value === val) return;
+      // try text match
+      const opt = Array.from(el.options).find((o) => o.textContent.trim() === val);
+      if (opt) {
+        el.value = opt.value;
+        return;
+      }
+      // fallback add option
+      const newOpt = document.createElement('option');
+      newOpt.value = val;
+      newOpt.textContent = val;
+      el.appendChild(newOpt);
+      el.value = val;
+    };
+    setVal('input[name="contractId"]', rec.projectId || '');
+    setVal('input[name="title"]', rec.title || '');
+    setVal('input[name="startDate"]', rec.startDate || '');
+    setVal('input[name="endDate"]', rec.endDate || '');
+    setSelectByValueOrText('select[name="contractType"]', rec.contractType || '');
+    setSelectByValueOrText('select[name="contractor"]', rec.contractor || '');
+    setSelectByValueOrText('select[name="currency"]', rec.currency || '');
+    setSelectByValueOrText('select[name="projectName"]', rec.description || '');
+    if (payItemsContainer) {
+      payItemsContainer.innerHTML = '';
+      if (rec.payItems && rec.payItems.length) {
+        rec.payItems.forEach((pi) => {
+          payItemsContainer.appendChild(createPayRow(pi.item || '', pi.qty || ''));
+        });
+      } else {
+        ensureOnePayRow();
+      }
+    }
+  }
   function createPayRow(item = '', qty = '') {
     const row = document.createElement('div');
     row.className = 'pay-row grid grid-cols-1 gap-3 sm:grid-cols-6 items-end';
@@ -810,6 +1116,80 @@
     });
   }
 
+  // Toggle edit from view
+  if (editContractBtn) {
+    editContractBtn.addEventListener('click', () => {
+      if (lastViewedRecord && ((lastViewedRecord.source || '').toString().toLowerCase() === 'g2')) {
+        // Editing is disabled for G2 imported contracts
+        return;
+      }
+      if (!lastViewedRecord) return;
+      if (modalTitle) modalTitle.textContent = 'Edit contract';
+      if (form) {
+        form.classList.remove('hidden');
+        prefillFormFromRecord(lastViewedRecord);
+      }
+      if (contractView) contractView.classList.add('hidden');
+      if (modalActions) modalActions.classList.remove('hidden');
+      if (sendBtn) sendBtn.textContent = 'Update';
+      if (saveDraftBtn) saveDraftBtn.textContent = 'Save';
+      if (editContractBtn) editContractBtn.classList.add('hidden');
+      if (statusBadge) statusBadge.classList.add('hidden');
+    });
+  }
+
+  // Status tooltip (clone Workflow body content)
+  let statusTooltipEl = null;
+  function hideStatusTooltip() {
+    if (statusTooltipEl) {
+      statusTooltipEl.remove();
+      statusTooltipEl = null;
+    }
+    document.removeEventListener('click', onDocClickForTooltip, true);
+  }
+  function onDocClickForTooltip(e) {
+    if (!statusTooltipEl) return;
+    if (statusTooltipEl.contains(e.target) || (statusBadge && statusBadge.contains(e.target))) return;
+    hideStatusTooltip();
+  }
+  function toggleStatusTooltip() {
+    if (!statusBadge || !workflowBodyContent) return;
+    if (statusTooltipEl) {
+      hideStatusTooltip();
+      return;
+    }
+    const rect = statusBadge.getBoundingClientRect();
+    const tip = document.createElement('div');
+    tip.className = 'fixed z-[80] w-[24rem] max-h-96 overflow-auto rounded-md border border-gray-200 bg-white p-3 shadow-xl';
+    tip.style.top = `${rect.bottom + window.scrollY + 8}px`;
+    tip.style.left = `${rect.left + window.scrollX}px`;
+    // Clone only the inner content of workflow body
+    const inner = document.createElement('div');
+    inner.innerHTML = workflowBodyContent.innerHTML;
+    // Strip edit controls from tooltip
+    [
+      '#editReviewersBtn','#saveReviewersBtn','#cancelReviewersBtn',
+      '#editAcceptanceBtn','#saveAcceptanceBtn','#cancelAcceptanceBtn',
+      '#editReviewersPanel','#editAcceptancePanel'
+    ].forEach((sel) => {
+      const el = inner.querySelector(sel);
+      if (el) el.remove();
+    });
+    tip.appendChild(inner);
+    document.body.appendChild(tip);
+    statusTooltipEl = tip;
+    // Close on outside click
+    setTimeout(() => {
+      document.addEventListener('click', onDocClickForTooltip, true);
+    }, 0);
+  }
+  if (statusBadge) {
+    statusBadge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleStatusTooltip();
+    });
+  }
+
   // Row click -> view modal
   if (tableBody) {
     tableBody.addEventListener('click', (e) => {
@@ -856,6 +1236,31 @@
       e.preventDefault();
       if (!validateForm()) return;
       const fd = new FormData(form);
+      // Update existing record if editing -> open Workflow
+      if (editingRecordId) {
+        const idx = contracts.findIndex((c) => String(c.id) === String(editingRecordId));
+        if (idx >= 0) {
+          const base = contracts[idx];
+          pendingRecord = {
+            ...base,
+            description: fd.get('projectName') || base.description,
+            projectId: fd.get('contractId') || base.projectId,
+            title: fd.get('title') || base.title,
+            contractType: fd.get('contractType') || base.contractType,
+            contractor: fd.get('contractor') || base.contractor,
+            startDate: fd.get('startDate') || base.startDate,
+            endDate: fd.get('endDate') || base.endDate,
+            currency: fd.get('currency') || base.currency,
+            payItems: collectPayItems(),
+            status: 'Submitted',
+            createdAt: base.createdAt || Date.now(),
+            source: base.source || 'Control center'
+          };
+          pendingIsUpdate = true;
+          openWorkflowModal();
+          return;
+        }
+      }
       pendingRecord = {
         id: Date.now(),
         createdAt: Date.now(),
@@ -872,6 +1277,7 @@
         status: 'Submitted',
         source: 'Control center'
       };
+      pendingIsUpdate = false;
       openWorkflowModal();
     });
   }
@@ -879,22 +1285,77 @@
     workflowSendBtn.addEventListener('click', (e) => {
       e.preventDefault();
       if (!pendingRecord) return;
-      contracts.push(pendingRecord);
+      // Start progression at "In review"
+      pendingRecord.status = 'In review';
+      const idx = contracts.findIndex((c) => String(c.id) === String(pendingRecord.id));
+      if (idx >= 0) {
+        contracts[idx] = pendingRecord;
+      } else {
+        contracts.push(pendingRecord);
+      }
       saveContracts(contracts);
       renderContracts(contracts);
+      // Schedule status progression: In review -> In acceptance -> Active
+      const idForProgress = pendingRecord.id;
+      setTimeout(() => {
+        const i1 = contracts.findIndex((c) => String(c.id) === String(idForProgress));
+        if (i1 >= 0 && contracts[i1].status === 'In review') {
+          contracts[i1].status = 'In acceptance';
+          saveContracts(contracts);
+          renderContracts(contracts);
+        }
+      }, 15000);
+      setTimeout(() => {
+        const i2 = contracts.findIndex((c) => String(c.id) === String(idForProgress));
+        if (i2 >= 0 && (contracts[i2].status === 'In acceptance' || contracts[i2].status === 'In review')) {
+          contracts[i2].status = 'Active';
+          saveContracts(contracts);
+          renderContracts(contracts);
+        }
+      }, 30000);
       closeWorkflowModal();
       closeModal();
       form.reset();
-      showToast('Contract sent successfully.', 'View', () => {
-        window.location.hash = '#contract-sent';
+      showToast(pendingIsUpdate ? 'Contract updated.' : 'Contract sent successfully.', 'View', () => {
+        window.location.hash = pendingIsUpdate ? '#contract-updated' : '#contract-sent';
       });
       pendingRecord = null;
+      pendingIsUpdate = false;
     });
   }
   if (saveDraftBtn) {
     saveDraftBtn.addEventListener('click', (e) => {
       e.preventDefault();
       const fd = new FormData(form);
+      // Update existing record if editing (save as draft)
+      if (editingRecordId) {
+        const idx = contracts.findIndex((c) => String(c.id) === String(editingRecordId));
+        if (idx >= 0) {
+          const updated = {
+            ...contracts[idx],
+            description: fd.get('projectName') || contracts[idx].description,
+            projectId: fd.get('contractId') || contracts[idx].projectId,
+            title: fd.get('title') || contracts[idx].title,
+            contractType: fd.get('contractType') || contracts[idx].contractType,
+            contractor: fd.get('contractor') || contracts[idx].contractor,
+            startDate: fd.get('startDate') || contracts[idx].startDate,
+            endDate: fd.get('endDate') || contracts[idx].endDate,
+            currency: fd.get('currency') || contracts[idx].currency,
+            payItems: collectPayItems(),
+            status: 'Draft'
+          };
+          contracts[idx] = updated;
+          saveContracts(contracts);
+          renderContracts(contracts);
+          closeModal();
+          form.reset();
+          showToast('Draft updated.', 'View', () => {
+            window.location.hash = '#draft-updated';
+          });
+          editingRecordId = null;
+          return;
+        }
+      }
       const rec = {
         id: Date.now(),
         createdAt: Date.now(),
