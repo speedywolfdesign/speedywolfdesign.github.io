@@ -242,6 +242,22 @@
         try {
           localStorage.setItem(`cm:seedG2For:${title}`, 'true');
         } catch {}
+        // Show a quick loading overlay then navigate to the contracts page
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[70] flex items-center justify-center bg-white/70 backdrop-blur-sm';
+        overlay.innerHTML = `
+          <div class="flex flex-col items-center gap-3">
+            <svg class="h-6 w-6 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            <div class="text-sm text-gray-700">Loading G2 contracts…</div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        setTimeout(() => {
+          navigateToContracts(title);
+        }, 600);
       }
       closeProjectModal();
       createProjectForm.reset();

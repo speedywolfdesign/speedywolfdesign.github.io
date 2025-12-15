@@ -59,6 +59,7 @@
             </a>
           </div>
           <nav class="hidden md:flex items-center gap-4 text-sm">
+            <span class="text-gray-600">Home</span>
             <a class="text-gray-600 hover:text-gray-900" href="projects.html">Projects</a>
           </nav>
           <div class="flex items-center gap-2">
@@ -152,17 +153,12 @@
               <div id="createMenu" class="absolute left-0 mt-2 hidden w-56 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg z-50">
                 <a id="createNewContractLink" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Create new contract</a>
                 <a id="importPWLink" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Import from ProcureWare</a>
-                <a id="useG2Link" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Use G2 contract</a>
+                <!-- <a id="useG2Link" href="#" class="block px-3 py-2 text-sm hover:bg-gray-50">Use G2 contract</a> -->
               </div>
             </div>
             <div class="flex items-center gap-2">
               <div class="hidden sm:flex items-center rounded-md border border-gray-200 bg-white">
-                <button id="openContractSettingsBtn" class="p-2 text-gray-600 hover:bg-gray-50" title="Contract settings">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.14 12.936a7.97 7.97 0 0 0 .06-.936c0-.318-.02-.63-.06-.936l2.037-1.582a.5.5 0 0 0 .121-.652l-1.93-3.342a.5.5 0 0 0-.607-.22l-2.398.96a8.042 8.042 0 0 0-1.617-.936l-.363-2.54A.5.5 0 0 0 13.94 1h-3.88a.5.5 0 0 0-.494.422l-.363 2.54a8.042 8.042 0 0 0-1.617.936l-2.398-.96a.5.5 0 0 0-.607.22L.65 7.96a.5.5 0 0 0 .121.652l2.037 1.582c-.04.306-.06.618-.06.936s.02.63.06.936L.77 13.65a.5.5 0 0 0-.121.652l1.93 3.342a.5.5 0 0 0 .607.22l2.398-.96c.5.36 1.045.67 1.617.936l.363 2.54a.5.5 0 0 0 .494.422h3.88a.5.5 0 0 0 .494-.422l.363-2.54c.572-.266 1.117-.575 1.617-.936l2.398.96a.5.5 0 0 0 .607-.22l1.93-3.342a.5.5 0 0 0-.121-.652l-2.037-1.582ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/>
-                  </svg>
-                </button>
-                <button class="border-l border-gray-200 p-2 text-gray-600 hover:bg-gray-50" title="Layout">
+                <button class="p-2 text-gray-600 hover:bg-gray-50" title="Layout">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M4 5h16v4H4V5Zm0 6h10v8H4v-8Zm12 0h4v8h-4v-8Z"/>
                   </svg>
@@ -631,51 +627,6 @@
       </div>
     </div>
 
-    <!-- Contract Settings Modal -->
-    <div id="contractSettingsModal" class="fixed inset-0 z-[70] hidden">
-      <div id="contractSettingsOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-      <div class="relative mx-auto flex h-full items-start justify-center p-4 sm:p-6">
-        <div class="mt-8 w-full max-w-xl overflow-hidden rounded-lg bg-white shadow-xl ring-1 ring-black/5">
-          <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-6">
-            <h3 class="text-base font-semibold">Contract settings</h3>
-            <button id="contractSettingsClose" class="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-              <span class="sr-only">Close</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.81 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/></svg>
-            </button>
-          </div>
-          <div class="px-4 py-4 sm:px-6">
-            <p class="text-sm text-gray-600">Update allowed ways to create contracts for <span class="font-medium" id="csProjectName">this project</span>.</p>
-            <form id="contractSettingsForm" class="mt-3 space-y-3">
-              <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
-                <div class="flex items-center gap-2">
-                  <span class="inline-flex h-6 w-6 items-center justify-center rounded bg-brand-600 text-xs font-semibold text-white">C</span>
-                  <span class="text-sm">Create new contract</span>
-                </div>
-                <input id="csOptCreate" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
-              </label>
-              <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
-                <div class="flex items-center gap-2">
-                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-orange-600">●</span>
-                  <span class="text-sm">Use ProcureWare</span>
-                </div>
-                <input id="csOptPW" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
-              </label>
-              <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
-                <div class="flex items-center gap-2">
-                  <span class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-300">✉</span>
-                  <span class="text-sm">Use G2 contracts (control centre)</span>
-                </div>
-                <input id="csOptG2" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
-              </label>
-            </form>
-          </div>
-          <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-            <button id="contractSettingsCancel" class="text-sm text-gray-700 hover:text-gray-900">Cancel</button>
-            <button id="contractSettingsSave" class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">Save</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <script src="assets/js/contracts.js"></script>
   </body>
