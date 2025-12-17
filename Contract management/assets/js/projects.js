@@ -194,6 +194,41 @@
     if (el) el.addEventListener('click', closeProjectModal);
   });
 
+  // Visual selection treatment for contract setting cards (no visible checkboxes)
+  function wireContractSettingCards() {
+    if (!createProjectForm) return;
+    const cards = Array.from(createProjectForm.querySelectorAll('.contract-setting-card'));
+    function updateCardState(card) {
+      const input = card.querySelector('input[type="checkbox"]');
+      const selected = !!(input && input.checked);
+      // Border-only highlight + subtle ring
+      card.classList.toggle('border-brand-500', selected);
+      card.classList.toggle('ring-2', selected);
+      card.classList.toggle('ring-brand-500', selected);
+      // Toggle check indicator
+      const check = card.querySelector('.selection-check');
+      if (check) {
+        check.classList.toggle('hidden', !selected);
+      }
+    }
+    cards.forEach((card) => {
+      const input = card.querySelector('input[type="checkbox"]');
+      if (!input) return;
+      // Ensure hidden
+      input.classList.add('sr-only');
+      // Initial UI
+      updateCardState(card);
+      // Click anywhere on card toggles checkbox (label behavior), then sync UI
+      card.addEventListener('click', (e) => {
+        // Let default label-toggle happen first
+        setTimeout(() => updateCardState(card), 0);
+      });
+      // Also listen to direct input change for keyboard users
+      input.addEventListener('change', () => updateCardState(card));
+    });
+  }
+  wireContractSettingCards();
+
   // Create project submit
   if (createProjectSubmit && createProjectForm) {
     createProjectSubmit.addEventListener('click', (e) => {
@@ -261,6 +296,8 @@
       }
       closeProjectModal();
       createProjectForm.reset();
+      // Re-apply selected visuals after reset (defaults)
+      wireContractSettingCards();
     });
   }
 
