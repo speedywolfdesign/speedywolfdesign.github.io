@@ -11,16 +11,16 @@
           extend: {
             colors: {
               brand: {
-                50: '#eef2ff',
-                100: '#e0e7ff',
-                200: '#c7d2fe',
-                300: '#a5b4fc',
-                400: '#818cf8',
-                500: '#6366f1',
-                600: '#4f46e5',
-                700: '#4338ca',
-                800: '#3730a3',
-                900: '#312e81'
+                50: '#326FD1',
+                100: '#326FD1',
+                200: '#326FD1',
+                300: '#326FD1',
+                400: '#326FD1',
+                500: '#326FD1',
+                600: '#326FD1',
+                700: '#326FD1',
+                800: '#326FD1',
+                900: '#326FD1'
               }
             },
             fontFamily: {
@@ -54,8 +54,8 @@
         <div class="flex h-14 items-center justify-between">
           <div class="flex items-center gap-3">
             <a href="projects.html" class="flex items-center gap-2">
-              <span class="inline-flex h-8 w-8 items-center justify-center rounded bg-brand-600 text-white font-semibold">C</span>
-              <span class="hidden sm:inline text-sm font-semibold tracking-tight">Contract</span>
+              <img src="assets/LOGO.svg" alt="Contract" class="h-8 w-8" />
+              <!-- <span class="hidden sm:inline text-sm font-semibold tracking-tight">Contract</span> -->
             </a>
           </div>
           <nav class="hidden md:flex items-center gap-4 text-sm">
@@ -83,25 +83,24 @@
       </div>
     </header>
 
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-      <div class="flex gap-6">
-        <!-- Sidebar (compact static) -->
-        <aside class="hidden lg:block w-60 shrink-0">
-          <nav class="rounded-lg border border-gray-200 bg-white">
-            <ul class="px-1 py-2">
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Project Home</a></li>
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Cost</a></li>
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Field Management</a></li>
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Procurement</a></li>
-              <li><a class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900" href="#"><span class="h-4 w-4 rounded bg-white"></span>Contracts</a></li>
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Invoices</a></li>
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Change Management</a></li>
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Reports</a></li>
-              <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Drive</a></li>
-            </ul>
-          </nav>
-        </aside>
+    <!-- Fixed, full-height left sidebar -->
+    <aside class="hidden lg:block fixed top-14 left-0 bottom-0 w-60 border-r border-gray-200 bg-white overflow-y-auto">
+      <nav>
+        <ul class="px-1 py-2">
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Project Home</a></li>
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Cost</a></li>
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Field Management</a></li>
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Procurement</a></li>
+          <li><a class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900" href="#"><span class="h-4 w-4 rounded bg-white"></span>Contracts</a></li>
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Invoices</a></li>
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Change Management</a></li>
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Reports</a></li>
+          <li><a class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#"><span class="h-4 w-4 rounded bg-gray-100"></span>Drive</a></li>
+        </ul>
+      </nav>
+    </aside>
 
+    <div class="px-4 sm:px-6 lg:px-8 py-6 lg:ml-60">
         <!-- Main -->
         <main class="flex-1">
           <!-- Breadcrumb -->
@@ -215,7 +214,6 @@
             </div>
           </div>
         </main>
-      </div>
     </div>
 
     <!-- Create Contract Modal -->

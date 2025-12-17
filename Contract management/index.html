@@ -11,16 +11,16 @@
           extend: {
             colors: {
               brand: {
-                50: '#eef2ff',
-                100: '#e0e7ff',
-                200: '#c7d2fe',
-                300: '#a5b4fc',
-                400: '#818cf8',
-                500: '#6366f1',
-                600: '#4f46e5',
-                700: '#4338ca',
-                800: '#3730a3',
-                900: '#312e81'
+                50: '#326FD1',
+                100: '#326FD1',
+                200: '#326FD1',
+                300: '#326FD1',
+                400: '#326FD1',
+                500: '#326FD1',
+                600: '#326FD1', // primary
+                700: '#326FD1',
+                800: '#326FD1',
+                900: '#326FD1'
               }
             },
             fontFamily: {
@@ -60,8 +60,8 @@
               </svg>
             </button>
             <a href="projects.html" class="flex items-center gap-2">
-              <span class="inline-flex h-8 w-8 items-center justify-center rounded bg-brand-600 text-white font-semibold">C</span>
-              <span class="hidden sm:inline text-sm font-semibold tracking-tight">Contract</span>
+              <img src="assets/LOGO.svg" alt="Contract" class="h-8 w-8" />
+              <!-- <span class="hidden sm:inline text-sm font-semibold tracking-tight">Contract</span> -->
             </a>
           </div>
           <nav class="hidden md:flex items-center gap-4 text-sm">
@@ -106,56 +106,55 @@
       </div>
     </header>
 
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-      <div class="flex gap-6">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="hidden lg:block w-60 shrink-0">
-          <nav class="rounded-lg border border-gray-200 bg-white">
-            <div class="p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Navigation</div>
-            <ul class="px-1 pb-2">
-              <li>
-                <a href="#" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M3 4h18v2H3V4Zm0 7h18v2H3v-2Zm0 7h18v2H3v-2Z"/>
-                    </svg>
-                  </span>
-                  Data warehouse
-                </a>
-              </li>
-              <li>
-                <a href="#" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7 3h10v2H7V3Zm-2 4h14v2H5V7Zm-1 4h16v2H4v-2Zm2 4h12v2H6v-2Z"/>
-                    </svg>
-                  </span>
-                  Archive
-                </a>
-              </li>
-              <li>
-                <a href="#" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4 5h16v2H4V5Zm0 6h16v2H4v-2Zm0 6h16v2H4v-2Z"/>
-                    </svg>
-                  </span>
-                  Calculations
-                </a>
-              </li>
-              <li>
-                <a href="#" class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10.5a.5.5 0 01-.8.4l-3.2-2.4H5a2 2 0 01-2-2V7Zm4 3h10V8H7v2Z"/>
-                    </svg>
-                  </span>
-                  Contract settings
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </aside>
+    <!-- Fixed, full-height left sidebar -->
+    <aside class="hidden lg:block fixed top-14 left-0 bottom-0 w-60 border-r border-gray-200 bg-white overflow-y-auto">
+      <nav>
+        <ul class="px-1 py-2">
+          <li>
+            <a href="#" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 4h18v2H3V4Zm0 7h18v2H3v-2Zm0 7h18v2H3v-2Z"/>
+                </svg>
+              </span>
+              Data warehouse
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 3h10v2H7V3Zm-2 4h14v2H5V7Zm-1 4h16v2H4v-2Zm2 4h12v2H6v-2Z"/>
+                </svg>
+              </span>
+              Archive
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M4 5h16v2H4V5Zm0 6h16v2H4v-2Zm0 6h16v2H4v-2Z"/>
+                </svg>
+              </span>
+              Calculations
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10.5a.5.5 0 01-.8.4l-3.2-2.4H5a2 2 0 01-2-2V7Zm4 3h10V8H7v2Z"/>
+                </svg>
+              </span>
+              Contract settings
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="px-4 sm:px-6 lg:px-8 py-6 lg:ml-60">
 
         <!-- Main content -->
         <main class="flex-1">
@@ -292,7 +291,6 @@
             </div>
           </div>
         </main>
-      </div>
     </div>
 
     <!-- Contract settings modal -->

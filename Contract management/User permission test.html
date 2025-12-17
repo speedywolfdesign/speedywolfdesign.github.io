@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Users – Enterprise Permissions Demo</title>
+  <style>
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:#f5f6f8;
+      margin:0;
+      padding:24px;
+      color:#111827;
+    }
+
+    .modal {
+      max-width:1100px;
+      margin:auto;
+      background:#fff;
+      border-radius:10px;
+      box-shadow:0 20px 40px rgba(0,0,0,.12);
+      overflow:hidden;
+    }
+
+    .header {
+      padding:20px 24px;
+      border-bottom:1px solid #e5e7eb;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    h1 { font-size:20px; margin:0; }
+
+    .content { padding:24px; }
+
+    .section { margin-bottom:28px; }
+
+    .section h2 {
+      font-size:16px;
+      margin:0 0 4px 0;
+    }
+
+    .section p {
+      margin:0 0 12px 0;
+      font-size:13px;
+      color:#6b7280;
+    }
+
+    /* Users table */
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th, td { padding:12px; border-bottom:1px solid #e5e7eb; text-align:left; }
+    th { font-size:12px; color:#6b7280; font-weight:600; }
+
+    .user-row.selected { background:#eff6ff; }
+
+    .pill {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      color:#fff;
+      font-size:12px;
+      font-weight:600;
+      margin-right:8px;
+    }
+
+    .active-dot {
+      width:8px;
+      height:8px;
+      background:#22c55e;
+      border-radius:50%;
+      display:inline-block;
+      margin-right:6px;
+    }
+
+    /* Permissions matrix */
+    .matrix th, .matrix td { text-align:center; }
+    .matrix th:first-child, .matrix td:first-child { text-align:left; }
+
+    .disabled {
+      opacity:.45;
+      pointer-events:none;
+    }
+
+    .warning {
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      color:#92400e;
+      padding:12px;
+      border-radius:8px;
+      font-size:13px;
+      margin-top:12px;
+      display:none;
+    }
+
+    .footer {
+      padding:16px 24px;
+      border-top:1px solid #e5e7eb;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    button {
+      border-radius:8px;
+      padding:10px 16px;
+      font-size:14px;
+      border:none;
+      cursor:pointer;
+    }
+
+    .primary { background:#2563eb; color:#fff; }
+    .ghost { background:none; color:#2563eb; }
+
+  </style>
+</head>
+<body>
+
+<div class="modal">
+  <div class="header">
+    <h1>Add users</h1>
+    ✕
+  </div>
+
+  <div class="content">
+
+    <!-- USERS LIST -->
+    <div class="section">
+      <h2>Users list *</h2>
+      <p>Add existing Control Center users as participants.</p>
+
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th></th>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-role="viewer">
+            <td><input type="checkbox"></td>
+            <td>EAMINOFF</td>
+            <td><span class="pill" style="background:#6366f1">EA</span>Erin Aminoff</td>
+            <td><span class="active-dot"></span>Active</td>
+          </tr>
+          <tr data-role="initiator">
+            <td><input type="checkbox"></td>
+            <td>EMERSON</td>
+            <td><span class="pill" style="background:#0ea5e9">EH</span>Emerson Herwitz</td>
+            <td><span class="active-dot"></span>Active</td>
+          </tr>
+          <tr data-role="reviewer">
+            <td><input type="checkbox"></td>
+            <td>JBAPTISTA</td>
+            <td><span class="pill" style="background:#4f46e5">JB</span>Jaydon Baptista</td>
+            <td><span class="active-dot"></span>Active</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ENTERPRISE PERMISSIONS -->
+    <div class="section">
+      <h2>Enterprise permissions (Global) *</h2>
+      <p>Set enterprise permissions for all task types.</p>
+
+      <table class="matrix" id="permissionMatrix">
+        <thead>
+          <tr>
+            <th>Task type</th>
+            <th>No access</th>
+            <th>Initiator</th>
+            <th>Viewer</th>
+            <th>Reviewer</th>
+            <th>Approver</th>
+            <th>Full access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-task="trend">
+            <td>Trend</td>
+            <td><input type="checkbox" data-perm="none"></td>
+            <td><input type="checkbox" data-perm="initiator"></td>
+            <td><input type="checkbox" data-perm="viewer"></td>
+            <td><input type="checkbox" data-perm="reviewer"></td>
+            <td><input type="checkbox" data-perm="approver"></td>
+            <td><input type="checkbox" data-perm="full"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div id="warning" class="warning"></div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <button class="ghost">Cancel</button>
+    <button class="primary">Next</button>
+  </div>
+</div>
+
+<script>
+  const roleOrder = ['viewer', 'initiator', 'reviewer', 'approver', 'full'];
+
+  const userRows = document.querySelectorAll('#usersTable tbody tr');
+  const permCheckboxes = document.querySelectorAll('#permissionMatrix input');
+  const warning = document.getElementById('warning');
+
+  function selectedRoles() {
+    return [...userRows]
+      .filter(r => r.querySelector('input').checked)
+      .map(r => r.dataset.role);
+  }
+
+  function selectedPerms() {
+    return [...permCheckboxes]
+      .filter(cb => cb.checked)
+      .map(cb => cb.dataset.perm);
+  }
+
+  function validatePermissions() {
+    const roles = selectedRoles();
+    const perms = selectedPerms();
+    let conflicts = [];
+
+    perms.forEach(p => {
+      roles.forEach(r => {
+        if (roleOrder.indexOf(p) > roleOrder.indexOf(r)) {
+          conflicts.push({ role: r, perm: p });
+        }
+      });
+    });
+
+    // reset all permissions
+    permCheckboxes.forEach(cb => {
+      cb.disabled = false;
+    });
+
+    if (conflicts.length) {
+      warning.style.display = 'block';
+      warning.innerHTML = `⚠️ Some selected users cannot receive the chosen permissions based on their role. Conflicting permissions have been removed.`;
+
+      const conflictedPerms = [...new Set(conflicts.map(c => c.perm))];
+
+      permCheckboxes.forEach(cb => {
+        if (conflictedPerms.includes(cb.dataset.perm)) {
+          cb.checked = false;   // uncheck
+          cb.disabled = true;   // then disable
+        }
+      });
+    } else {
+      warning.style.display = 'none';
+    }
+  }
+
+  userRows.forEach(row => {
+    row.querySelector('input').addEventListener('change', () => {
+      row.classList.toggle('selected', row.querySelector('input').checked);
+      validatePermissions();
+    });
+  });
+
+  permCheckboxes.forEach(cb => cb.addEventListener('change', validatePermissions));
+</script>
+
+</body>
+</html>
