@@ -20,6 +20,32 @@
   const optG2 = document.getElementById('optG2');
   let prevModalSettings = null;
 
+  // Visual selection treatment for modal contract setting cards
+  function wireModalContractSettingCards() {
+    if (!modal) return;
+    const cards = Array.from(modal.querySelectorAll('.contract-setting-card'));
+    function updateCardState(card) {
+      const input = card.querySelector('input[type="checkbox"]');
+      const selected = !!(input && input.checked);
+      card.classList.toggle('border-brand-500', selected);
+      card.classList.toggle('ring-2', selected);
+      card.classList.toggle('ring-brand-500', selected);
+      const check = card.querySelector('.selection-check');
+      if (check) check.classList.toggle('hidden', !selected);
+    }
+    cards.forEach((card) => {
+      const input = card.querySelector('input[type="checkbox"]');
+      if (!input) return;
+      input.classList.add('sr-only');
+      updateCardState(card);
+      card.addEventListener('click', () => {
+        // allow label default toggle first
+        setTimeout(() => updateCardState(card), 0);
+      });
+      input.addEventListener('change', () => updateCardState(card));
+    });
+  }
+
   // Projects rendering to keep in sync with Projects page
   function loadProjects() {
     try {
@@ -139,6 +165,8 @@
     if (optCreate) optCreate.checked = !!settings.createNew;
     if (optPW) optPW.checked = !!settings.importPW;
     if (optG2) optG2.checked = !!settings.g2;
+    // Sync selection visuals
+    wireModalContractSettingCards();
     modal.classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
   }
