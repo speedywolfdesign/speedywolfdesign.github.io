@@ -475,26 +475,56 @@
               <details class="rounded-md border border-gray-200 bg-white" open>
                 <summary class="cursor-pointer select-none px-3 py-2 text-sm font-medium">Contract settings</summary>
                 <div class="border-t border-gray-200 p-3 space-y-3">
-                  <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
-                    <div class="flex items-center gap-2">
-                      <span class="inline-flex h-6 w-6 items-center justify-center rounded bg-brand-600 text-xs font-semibold text-white">C</span>
-                      <span class="text-sm">Create new contract</span>
+                  <label class="contract-setting-card relative flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 cursor-pointer transition">
+                    <div class="flex items-start gap-2">
+                      <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded bg-brand-600 text-xs font-semibold text-white">C</span>
+                      <div>
+                        <div class="text-sm">Create new contract</div>
+                        <p class="mt-1 text-xs leading-5 text-gray-600">
+                          This contract allows for direct engagement with a vendor, eliminating the need for a bidding process. It’s particularly beneficial when you have a trusted relationship with the vendor.
+                        </p>
+                      </div>
                     </div>
-                    <input name="optCreateNew" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" checked />
+                    <input name="optCreateNew" type="checkbox" class="sr-only" checked />
+                    <span class="selection-check absolute right-2 top-2 hidden h-5 w-5 rounded-full bg-green-500 text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L8.5 11.086l6.543-6.543a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    </span>
                   </label>
-                  <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
-                    <div class="flex items-center gap-2">
-                      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-orange-600">●</span>
-                      <span class="text-sm">Use ProcureWare</span>
+                  <label class="contract-setting-card relative flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 cursor-pointer transition">
+                    <div class="flex items-start gap-2">
+                      <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-orange-600">●</span>
+                      <div>
+                        <div class="text-sm">Use ProcureWare</div>
+                        <p class="mt-1 text-xs leading-5 text-gray-600">
+                          Description here explain what it is — this selection allows you to import contracts from ProcureWare and manage it in Contruent enterprise.
+                        </p>
+                      </div>
                     </div>
-                    <input name="optProcureWare" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
+                    <input name="optProcureWare" type="checkbox" class="sr-only" />
+                    <span class="selection-check absolute right-2 top-2 hidden h-5 w-5 rounded-full bg-green-500 text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L8.5 11.086l6.543-6.543a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    </span>
                   </label>
-                  <label class="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
-                    <div class="flex items-center gap-2">
-                      <span class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-300">✉</span>
-                      <span class="text-sm">Use G2 contracts (control centre)</span>
+                  <label class="contract-setting-card relative flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 cursor-pointer transition">
+                    <div class="flex items-start gap-2">
+                      <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded border border-gray-300">✉</span>
+                      <div>
+                        <div class="text-sm">Use G2 contracts (control centre)</div>
+                        <p class="mt-1 text-xs leading-5 text-gray-600">
+                          Description here explain what it is — this selection allows you to import contracts from ProcureWare and manage it in Contruent enterprise.
+                        </p>
+                      </div>
                     </div>
-                    <input name="optG2" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600" />
+                    <input name="optG2" type="checkbox" class="sr-only" />
+                    <span class="selection-check absolute right-2 top-2 hidden h-5 w-5 rounded-full bg-green-500 text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L8.5 11.086l6.543-6.543a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    </span>
                   </label>
                 </div>
               </details>
