@@ -30,23 +30,12 @@
     }
 
     h1 { font-size:20px; margin:0; }
-
     .content { padding:24px; }
-
     .section { margin-bottom:28px; }
 
-    .section h2 {
-      font-size:16px;
-      margin:0 0 4px 0;
-    }
+    .section h2 { font-size:16px; margin:0 0 4px 0; }
+    .section p { margin:0 0 12px 0; font-size:13px; color:#6b7280; }
 
-    .section p {
-      margin:0 0 12px 0;
-      font-size:13px;
-      color:#6b7280;
-    }
-
-    /* Users table */
     table { width:100%; border-collapse:collapse; font-size:14px; }
     th, td { padding:12px; border-bottom:1px solid #e5e7eb; text-align:left; }
     th { font-size:12px; color:#6b7280; font-weight:600; }
@@ -75,24 +64,49 @@
       margin-right:6px;
     }
 
-    /* Permissions matrix */
     .matrix th, .matrix td { text-align:center; }
     .matrix th:first-child, .matrix td:first-child { text-align:left; }
 
-    .disabled {
-      opacity:.45;
-      pointer-events:none;
+    .global-warning {
+      display:none;
+      background:#fff1f2;
+      border-bottom:1px solid #fecdd3;
+      color:#9f1239;
+      padding:14px 24px;
+      font-size:14px;
     }
 
-    .warning {
-      background:#fff7ed;
-      border:1px solid #fed7aa;
-      color:#92400e;
-      padding:12px;
-      border-radius:8px;
-      font-size:13px;
-      margin-top:12px;
+    .conflict-summary {
       display:none;
+      background:#f8fafc;
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 24px;
+      font-size:13px;
+      color:#374151;
+    }
+
+    .tooltip { position:relative; cursor:help; }
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position:absolute;
+      bottom:120%;
+      left:50%;
+      transform:translateX(-50%);
+      background:#111827;
+      color:#fff;
+      padding:8px 10px;
+      border-radius:6px;
+      font-size:12px;
+      white-space:pre-line;
+      z-index:10;
+      max-width:280px;
+      line-height:1.4;
+    }
+
+    .conflict {
+      outline:2px solid #fca5a5;
+      outline-offset:2px;
+      border-radius:4px;
     }
 
     .footer {
@@ -113,7 +127,6 @@
 
     .primary { background:#2563eb; color:#fff; }
     .ghost { background:none; color:#2563eb; }
-
   </style>
 </head>
 <body>
@@ -124,9 +137,11 @@
     ✕
   </div>
 
+  <div id="globalWarning" class="global-warning"></div>
+  <div id="conflictSummary" class="conflict-summary"></div>
+
   <div class="content">
 
-    <!-- USERS LIST -->
     <div class="section">
       <h2>Users list *</h2>
       <p>Add existing Control Center users as participants.</p>
@@ -163,7 +178,6 @@
       </table>
     </div>
 
-    <!-- ENTERPRISE PERMISSIONS -->
     <div class="section">
       <h2>Enterprise permissions (Global) *</h2>
       <p>Set enterprise permissions for all task types.</p>
@@ -181,7 +195,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr data-task="trend">
+          <tr>
             <td>Trend</td>
             <td><input type="checkbox" data-perm="none"></td>
             <td><input type="checkbox" data-perm="initiator"></td>
@@ -192,8 +206,6 @@
           </tr>
         </tbody>
       </table>
-
-      <div id="warning" class="warning"></div>
     </div>
 
   </div>
@@ -205,67 +217,104 @@
 </div>
 
 <script>
-  const roleOrder = ['viewer', 'initiator', 'reviewer', 'approver', 'full'];
-
+  const roleOrder = ['viewer','initiator','reviewer','approver','full'];
   const userRows = document.querySelectorAll('#usersTable tbody tr');
   const permCheckboxes = document.querySelectorAll('#permissionMatrix input');
-  const warning = document.getElementById('warning');
+  const warning = document.getElementById('globalWarning');
+  const summary = document.getElementById('conflictSummary');
 
-  function selectedRoles() {
+  const truncateName = (name, max=14) =>
+    name.length <= max ? name : `${name.slice(0,5)}…${name.slice(-3)}`;
+
+  function selectedUsers() {
     return [...userRows]
       .filter(r => r.querySelector('input').checked)
-      .map(r => r.dataset.role);
-  }
-
-  function selectedPerms() {
-    return [...permCheckboxes]
-      .filter(cb => cb.checked)
-      .map(cb => cb.dataset.perm);
+      .map(r => ({ name: r.children[2].innerText.trim(), role: r.dataset.role }));
   }
 
   function validatePermissions() {
-    const roles = selectedRoles();
-    const perms = selectedPerms();
+    const users = selectedUsers();
+    const perms = [...permCheckboxes].filter(c => c.checked).map(c => c.dataset.perm);
     let conflicts = [];
 
-    perms.forEach(p => {
-      roles.forEach(r => {
-        if (roleOrder.indexOf(p) > roleOrder.indexOf(r)) {
-          conflicts.push({ role: r, perm: p });
+    perms.forEach(p =>
+      users.forEach(u => {
+        if (roleOrder.indexOf(p) > roleOrder.indexOf(u.role)) {
+          conflicts.push({ user:u, perm:p });
         }
-      });
-    });
+      })
+    );
 
-    // reset all permissions
     permCheckboxes.forEach(cb => {
       cb.disabled = false;
+      cb.classList.remove('conflict','tooltip');
+      cb.removeAttribute('data-tooltip');
     });
 
-    if (conflicts.length) {
-      warning.style.display = 'block';
-      warning.innerHTML = `⚠️ Some selected users cannot receive the chosen permissions based on their role. Conflicting permissions have been removed.`;
-
-      const conflictedPerms = [...new Set(conflicts.map(c => c.perm))];
-
-      permCheckboxes.forEach(cb => {
-        if (conflictedPerms.includes(cb.dataset.perm)) {
-          cb.checked = false;   // uncheck
-          cb.disabled = true;   // then disable
-        }
-      });
-    } else {
-      warning.style.display = 'none';
+    if (!conflicts.length) {
+      warning.style.display = summary.style.display = 'none';
+      return;
     }
+
+    const conflictedPerms = [...new Set(conflicts.map(c => c.perm))];
+    const conflictedUsers = [...new Set(conflicts.map(c => c.user.name))];
+
+    warning.style.display = summary.style.display = 'block';
+    warning.innerText = '⚠️ Permission conflict detected. Some permissions were removed.';
+    summary.innerHTML =
+      `Blocked by: <strong>${conflictedUsers.join(', ')}</strong> · ` +
+      `Permissions: <strong>${conflictedPerms.join(', ')}</strong>`;
+
+    permCheckboxes.forEach(cb => {
+      if (conflictedPerms.includes(cb.dataset.perm)) {
+        const blocked = users.filter(
+          u => roleOrder.indexOf(cb.dataset.perm) > roleOrder.indexOf(u.role)
+        );
+        cb.checked = false;
+        cb.disabled = true;
+        cb.classList.add('conflict','tooltip');
+        cb.setAttribute(
+          'data-tooltip',
+          'Not allowed for:\n' +
+          blocked.map(b => `• ${truncateName(b.name)}`).join('\n') +
+          '\n\nConsider upgrading their role.'
+        );
+      }
+    });
   }
 
   userRows.forEach(row => {
-    row.querySelector('input').addEventListener('change', () => {
-      row.classList.toggle('selected', row.querySelector('input').checked);
+    const cb = row.querySelector('input');
+    cb.addEventListener('change', () => {
+      row.classList.toggle('selected', cb.checked);
       validatePermissions();
     });
   });
 
-  permCheckboxes.forEach(cb => cb.addEventListener('change', validatePermissions));
+  permCheckboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const rowCbs = [...cb.closest('tr').querySelectorAll('input[data-perm]')];
+      const perm = cb.dataset.perm;
+
+      if (perm === 'none' && cb.checked)
+        rowCbs.forEach(c => c.dataset.perm !== 'none' && (c.checked=false));
+
+      if (perm !== 'none' && cb.checked)
+        rowCbs.find(c => c.dataset.perm === 'none').checked = false;
+
+      if (perm === 'full' && cb.checked)
+        rowCbs.forEach(c => c.dataset.perm !== 'none' && (c.checked=true));
+
+      if (perm === 'full' && !cb.checked)
+        rowCbs.forEach(c => c.checked=false);
+
+      const granular = ['initiator','viewer','reviewer','approver'];
+      if (granular.every(p => rowCbs.find(c => c.dataset.perm===p).checked))
+        rowCbs.find(c => c.dataset.perm==='full').checked = true;
+
+      validatePermissions();
+    });
+  });
 </script>
 
 </body>
