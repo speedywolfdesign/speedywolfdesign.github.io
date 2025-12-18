@@ -19,6 +19,9 @@
       border-radius:10px;
       box-shadow:0 20px 40px rgba(0,0,0,.12);
       overflow:hidden;
+      height: calc(100vh - 50px);
+      display:flex;
+      flex-direction:column;
     }
 
     .header {
@@ -30,7 +33,7 @@
     }
 
     h1 { font-size:20px; margin:0; }
-    .content { padding:24px; }
+    .content { padding:24px; flex: 1 1 auto; overflow: auto; min-height: 0; }
     .section { margin-bottom:28px; }
 
     .section h2 { font-size:16px; margin:0 0 4px 0; }
@@ -175,6 +178,18 @@
             <td><span class="pill" style="background:#4f46e5">JB</span>Jaydon Baptista</td>
             <td><span class="active-dot"></span>Active</td>
           </tr>
+          <tr data-role="approver">
+            <td><input type="checkbox"></td>
+            <td>KLEE</td>
+            <td><span class="pill" style="background:#10b981">KL</span>Kai Lee</td>
+            <td><span class="active-dot"></span>Active</td>
+          </tr>
+          <tr data-role="full">
+            <td><input type="checkbox"></td>
+            <td>MRODRIGUEZ</td>
+            <td><span class="pill" style="background:#a855f7">MR</span>Marisol Rodriguez</td>
+            <td><span class="active-dot"></span>Active</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -236,9 +251,13 @@
   function validatePermissions() {
     const users = selectedUsers();
     const perms = [...permCheckboxes].filter(c => c.checked).map(c => c.dataset.perm);
+    const granular = ['initiator','viewer','reviewer','approver'];
+    const allGranularChecked = granular.every(p => perms.includes(p));
+    // If all granular are selected, treat "full" as redundant for conflict checks
+    const permsToCheck = allGranularChecked ? perms.filter(p => p !== 'full') : perms;
     let conflicts = [];
 
-    perms.forEach(p =>
+    permsToCheck.forEach(p =>
       users.forEach(u => {
         if (roleOrder.indexOf(p) > roleOrder.indexOf(u.role)) {
           conflicts.push({ user:u, perm:p });
@@ -255,6 +274,19 @@
     if (!conflicts.length) {
       warning.style.display = summary.style.display = 'none';
       return;
+    }
+
+    // When any conflicts exist, Full access cannot be checked; include conflicting user names
+    const fullPerm = [...permCheckboxes].find(cb => cb.dataset.perm === 'full');
+    if (fullPerm) {
+      const conflictNames = [...new Set(conflicts.map(c => c.user.name))];
+      fullPerm.checked = false;
+      fullPerm.disabled = true;
+      fullPerm.classList.add('conflict','tooltip');
+      fullPerm.setAttribute(
+        'data-tooltip',
+        `Full access disabled due to conflicts with:\n` + conflictNames.map(n => `• ${n}`).join('\n')
+      );
     }
 
     const conflictedPerms = [...new Set(conflicts.map(c => c.perm))];
@@ -310,8 +342,14 @@
         rowCbs.forEach(c => c.checked=false);
 
       const granular = ['initiator','viewer','reviewer','approver'];
-      if (granular.every(p => rowCbs.find(c => c.dataset.perm===p).checked))
-        rowCbs.find(c => c.dataset.perm==='full').checked = true;
+      const fullCb = rowCbs.find(c => c.dataset.perm === 'full');
+      const allGranularChecked = granular.every(p => rowCbs.find(c => c.dataset.perm===p).checked);
+      if (allGranularChecked) {
+        fullCb.checked = true;
+      } else {
+        // If any granular permission is unchecked, Full access must be unchecked
+        fullCb.checked = false;
+      }
 
       validatePermissions();
     });
