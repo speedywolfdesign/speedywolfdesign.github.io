@@ -245,7 +245,16 @@
   function selectedUsers() {
     return [...userRows]
       .filter(r => r.querySelector('input').checked)
-      .map(r => ({ name: r.children[2].innerText.trim(), role: r.dataset.role }));
+      .map(r => {
+        const nameCell = r.children[2];
+        // Use only the text nodes in the cell (exclude the initials pill span)
+        const plainName = [...nameCell.childNodes]
+          .filter(n => n.nodeType === Node.TEXT_NODE)
+          .map(n => n.textContent)
+          .join('')
+          .trim();
+        return { name: plainName, role: r.dataset.role };
+      });
   }
 
   function validatePermissions() {
