@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Music Joiner – Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MP3 encoder for client-side export -->
+  <script src="https://unpkg.com/lamejs@1.2.0/lame.min.js"></script>
+
+  <style>
+    :root {
+      --bg:#0b2447;
+      --bg2:#09203a;
+      --row:#0f2d57;
+      --row2:#0a2548;
+      --ink:#e5f0ff;
+      --muted:#9fb4d6;
+      --primary:#22d3ee;
+      --primary-weak: rgba(34,211,238,.2);
+      --brand:#326FD1;
+    }
+    body { background: radial-gradient(1200px 600px at 30% -10%, #0f3670 0%, var(--bg) 40%), linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); }
+    .handle { width: 10px; cursor: ew-resize; }
+    .wave-canvas { width:100%; height: 96px; display:block; }
+    .sel-fill { position:absolute; top:0; bottom:0; background: rgba(56,189,248,.10); pointer-events:none; }
+    .bracket { position:absolute; top:0; bottom:0; width:14px; background:transparent; cursor:ew-resize; z-index:10; }
+    .bracket.start { border-right:8px solid var(--primary); border-left:none; }
+    .bracket.end { border-left:8px solid var(--primary); border-right:none; }
+    
+    .bracket.start::before { left:-18px; }
+    .bracket.end::before { left:calc(100% + 18px); }
+    /* capsule overflow look */
+    /* .bracket.start::after, .bracket.end::after {
+      content:'';
+      position:absolute; top:50%; transform:translateY(-50%); height:86%; width:72px;
+      background: radial-gradient(120px 100% at 30% 30%, #ffd54f 0%, #f4b400 70%, #d69e00 100%);
+      border-radius:36px; box-shadow:0 6px 16px rgba(0,0,0,.25) inset, 0 0 0 1px rgba(255,255,255,.08);
+      pointer-events:none; opacity:.98;
+    } */
+    .bracket.start::after { right:100%; }
+    .bracket.end::after { left:100%; }
+    /* Hover distinction: color + small tags */
+    .bracket.start:hover { border-right-color:#fb7185; }
+    .bracket.end:hover { border-left-color:#fb7185; }
+    .bracket.start:hover::after {
+      content:'START';
+      position:absolute; top:-18px; right:-4px;
+      transform:translateX(50%);
+      background:rgba(190,24,93,.85); color:#e6f6ff; font-size:10px; padding:2px 6px; border-radius:6px;
+      border:1px solid rgba(255,255,255,.15);
+    }
+    .bracket.end:hover::after {
+      content:'END';
+      position:absolute; top:-18px; left:-4px;
+      transform:translateX(-50%);
+      background:rgba(190,24,93,.85); color:#ffeef5; font-size:10px; padding:2px 6px; border-radius:6px;
+      border:1px solid rgba(255,255,255,.15);
+    }
+    .track-row { background: linear-gradient(180deg, var(--row) 0%, var(--row2) 100%); border:1px solid rgba(255,255,255,.08); }
+    .remove-x { opacity:.6 }
+    .remove-x:hover { opacity:1 }
+    .drag-handle { width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; cursor:grab; color:#cbd5e1; }
+    .drag-handle:hover { color:#e2e8f0; }
+    .track-row.drag-ghost { opacity:.6; }
+    .track-row { transition: background-color .12s linear; }
+    .drop-marker {
+      height: 0;
+      margin: 4px 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(56,189,248,.0), rgba(56,189,248,.9), rgba(56,189,248,.0));
+      box-shadow: 0 0 0 1px rgba(34,211,238,.25);
+      transition: height .12s linear, margin .12s linear, opacity .12s linear;
+      opacity: .9;
+    }
+    .clips-dropping .drop-marker { height: 10px; margin: 8px 0; }
+    .drop-clue {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      font-size: 10px;
+      background: rgba(14,23,42,.9);
+      color: #c7e9ff;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 6px;
+      padding: 2px 6px;
+      pointer-events: none;
+    }
+    /* Playhead (time pin) */
+    .playhead {
+      position:absolute; top:0; bottom:0; width:2px; background:#ef4444; box-shadow:0 0 0 1px rgba(239,68,68,.5);
+      transform: translateX(-1px); display:none;
+      cursor: col-resize;
+      z-index: 20;
+    }
+    .playhead::before {
+      content:''; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
+      border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:8px solid #ef4444;
+    }
+    .playhead::after {
+      content: attr(data-time);
+      position:absolute; top:-20px; left:-26px;
+      background:rgba(15,23,42,.8); color:#e2f0ff; padding:2px 6px; border-radius:6px; font-size:10px;
+      border:1px solid rgba(255,255,255,.15);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-[14px] text-sky-50/90">
+
+  <div class="max-w-6xl mx-auto px-5 pt-6 pb-28">
+
+    <!-- Header / actions -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-3">
+        <div class="text-lg font-semibold tracking-tight text-sky-50">Audio Joiner</div>
+        <span class="text-xs text-sky-100/60">Prototype</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-sky-100/10 hover:bg-sky-100/15 ring-1 ring-sky-100/15 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-300" viewBox="0 0 24 24" fill="currentColor"><path d="M13 11V3h-2v8H3v2h8v8h2v-8h8v-2h-8Z"/></svg>
+          <span class="text-sky-50">Add files</span>
+          <input id="fileInput" type="file" multiple accept="audio/*" class="hidden" />
+        </label>
+      </div>
+    </div>
+
+    <!-- Clips -->
+    <div id="clips" class="space-y-4"></div>
+
+  </div>
+
+  <!-- Bottom controls -->
+  <div class="fixed bottom-0 left-0 right-0 border-t border-sky-100/10 bg-sky-950/60 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4 w-2/3">
+        <button id="playAllBtn" class="flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-400 text-sky-950 font-semibold hover:bg-cyan-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5Z"/></svg>
+          <span>Play all</span>
+        </button>
+        <div class="flex-1">
+          <div class="w-full h-2 rounded bg-sky-900/60 ring-1 ring-sky-100/10 overflow-hidden">
+            <div id="playlistProgressFill" class="h-full w-0 bg-cyan-400"></div>
+          </div>
+          <div class="mt-1 text-[11px] text-sky-100/70"><span id="playlistTime">00:00</span> / <span id="playlistTotal">00:00</span></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <select id="formatSel" class="bg-sky-900/60 text-sky-50 rounded px-2 py-1 text-xs ring-1 ring-sky-100/10">
+          <option value="wav">wav</option>
+          <option value="mp3">mp3</option>
+        </select>
+        <button id="joinBtn" class="px-4 py-2 rounded-md bg-cyan-400 text-sky-950 font-semibold hover:bg-cyan-300">Join</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+let clipsContainer = document.getElementById("clips")
+let fileInput = document.getElementById("fileInput")
+let audioCtx = null
+let tracks = []
+let activeTrack = null
+// Playlist controls
+const playAllBtn = document.getElementById("playAllBtn")
+const progressFill = document.getElementById("playlistProgressFill")
+const playlistTimeEl = document.getElementById("playlistTime")
+const playlistTotalEl = document.getElementById("playlistTotal")
+let playlist = { playing:false, paused:false, raf:null, resumeIndex:0, resumeOffsetMs:0, resetOnNext:false }
+// DnD state
+const dnd = { dragging: null, overRow: null, after: false }
+// Drop marker element
+const dropMarker = document.createElement('div'); dropMarker.className = 'drop-marker'
+// Audio constants
+const FADE_MS = 300
+
+fileInput.addEventListener("change", e => {
+  ;[...e.target.files].forEach(file => createClip(file))
+  e.target.value = ""
+})
+
+function getAudioContext() {
+  if (!audioCtx || audioCtx.state === "closed") {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 })
+  }
+  return audioCtx
+}
+
+function fmt(ms) {
+  const m = Math.floor(ms / 60000)
+  const s = Math.floor(ms % 60000 / 1000)
+  const msms = Math.floor(ms % 1000)
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}:${String(msms).padStart(3,"0")}`
+}
+function fmtMin(ms) {
+  const m = Math.floor(ms / 60000)
+  const s = Math.floor(ms % 60000 / 1000)
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+}
+function selectedMs(t){ return Math.max(0, (t.end||0) - (t.start||0)) }
+function totalSelectedMs(){ return tracks.reduce((a,t)=>a + selectedMs(t), 0) }
+function parseTime(val) {
+  const [m,s,ms] = val.split(":").map(Number)
+  return (m||0)*60000 + (s||0)*1000 + (ms||0)
+}
+
+async function createClip(file) {
+  const clip = document.createElement("div")
+  clip.className = "track-row rounded-xl p-4 space-y-3"
+  const trackId = Math.random().toString(36).slice(2,9)
+  clip.dataset.id = trackId
+
+  clip.innerHTML = `
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="drag-handle" title="Drag to reorder" draggable="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+            <path d="M7 5.75A1.25 1.25 0 1 1 7 8.25a1.25 1.25 0 0 1 0-2.5Zm0 6a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm6.5-4.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm0 6a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"/>
+          </svg>
+        </span>
+        <div class="font-medium text-sky-50/90">${file.name}</div>
+      </div>
+      <button class="remove text-sky-100/70 hover:text-red-400 remove-x" title="Remove">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19 19 6l1.5 1.5L7.5 20.5 6 19Zm0-12 1.5-1.5L20.5 18 19 19.5 6 7Z"/></svg>
+      </button>
+    </div>
+
+    <div class="relative h-24 rounded overflow-visible select-none ring-1 ring-sky-100/10">
+      <div class="sel-fill selection" style="pointer-events:auto; cursor:grab"></div>
+      <div class="playhead" data-time="00:00:000"></div>
+      <div class="bracket start handle"></div>
+      <div class="bracket end handle"></div>
+      <canvas class="wave-canvas"></canvas>
+    </div>
+
+    <div class="flex gap-4 text-xs text-sky-100/70">
+      <div>
+        <label>Start</label>
+        <input class="startInput bg-sky-900/40 text-sky-50 rounded px-2 py-1 w-28 ring-1 ring-sky-100/10 ml-2" value="00:00:000">
+      </div>
+      <div>
+        <label>End</label>
+        <input class="endInput bg-sky-900/40 text-sky-50 rounded px-2 py-1 w-28 ring-1 ring-sky-100/10 ml-2" value="00:00:000">
+      </div>
+      <label class="inline-flex items-center gap-2 ml-2">
+        <input type="checkbox" class="fadeToggle accent-cyan-400">
+        <span>Fade</span>
+      </label>
+      <button class="play ml-auto px-3 py-1 rounded bg-cyan-400/20 text-cyan-200 ring-1 ring-cyan-300/30 hover:bg-cyan-400/30">Play selection</button>
+    </div>
+  `
+
+  const waveCanvas = clip.querySelector(".wave-canvas")
+  const selection = clip.querySelector(".selection")
+  const playhead = clip.querySelector(".playhead")
+  const startHandle = clip.querySelector(".start")
+  const endHandle = clip.querySelector(".end")
+  const startInput = clip.querySelector(".startInput")
+  const endInput = clip.querySelector(".endInput")
+  const playBtn = clip.querySelector(".play")
+  const dragHandle = clip.querySelector(".drag-handle")
+  const fadeToggle = clip.querySelector(".fadeToggle")
+
+  // Decode
+  const ac = getAudioContext()
+  let buffer
+  try {
+    const ab = await file.arrayBuffer()
+    buffer = await ac.decodeAudioData(ab.slice(0))
+  } catch (e) {
+    alert(`Failed to decode ${file.name}`)
+    return
+  }
+  const durationMs = buffer.duration * 1000
+
+  // Peaks for vertical bars rendering on canvas
+  function computePeaks(buffer, width = 1000) {
+    const ch = buffer.numberOfChannels
+    const samples = buffer.getChannelData(0).length
+    const tmp = new Float32Array(samples)
+    for (let c = 0; c < ch; c++) {
+      const cd = buffer.getChannelData(c)
+      for (let i = 0; i < samples; i++) tmp[i] += cd[i] / ch
+    }
+    const block = Math.max(1, Math.floor(samples / width))
+    const peaks = new Float32Array(width)
+    for (let i = 0; i < width; i++) {
+      const start = i * block
+      let sum = 0
+      for (let j = 0; j < block && start + j < samples; j++) sum += Math.abs(tmp[start + j])
+      peaks[i] = sum / block
+    }
+    return peaks
+  }
+  const peaks = computePeaks(buffer, 1000)
+
+  function draw(peaks, selPx, fadePx = 0) {
+    const ctx = waveCanvas.getContext("2d")
+    const dpr = window.devicePixelRatio || 1
+    const W = waveCanvas.clientWidth * dpr
+    const H = waveCanvas.clientHeight * dpr
+    if (waveCanvas.width !== W) waveCanvas.width = W
+    if (waveCanvas.height !== H) waveCanvas.height = H
+    ctx.clearRect(0,0,W,H)
+    // Dark mode background for waveform lane
+    ctx.fillStyle = "#0e1b2b"
+    ctx.fillRect(0,0,W,H)
+    const scaleX = W / peaks.length
+    // Draw base (unselected) waveform in dim color
+    const baseColor = "rgba(148,163,184,0.35)" // slate-400 @ 35%
+    const hiColor = "#22d3ee" // cyan highlight
+    ctx.lineWidth = Math.max(1, dpr)
+    ctx.strokeStyle = baseColor
+    for (let i = 0; i < peaks.length; i++) {
+      const amp = Math.max(2, peaks[i] * (H - 16))
+      const x = Math.round(i * scaleX) + 0.5
+      ctx.beginPath()
+      ctx.moveTo(x, (H - amp) / 2)
+      ctx.lineTo(x, (H + amp) / 2)
+      ctx.stroke()
+    }
+    // Overdraw selected region bars with bright highlight color
+    if (selPx) {
+      const x0 = Math.max(0, Math.min(selPx[0], selPx[1]))
+      const x1 = Math.min(W, Math.max(selPx[0], selPx[1]))
+      const widthSel = Math.max(0, x1 - x0)
+      const fadeWidth = Math.max(0, Math.min(fadePx || 0, widthSel / 2))
+      ctx.strokeStyle = hiColor
+      for (let i = 0; i < peaks.length; i++) {
+        const x = Math.round(i * scaleX) + 0.5
+        if (x < x0 || x > x1) continue
+        // Triangular envelope for visual fade at edges
+        let mult = 1
+        if (fadeWidth > 0) {
+          if (x <= x0 + fadeWidth) {
+            mult = (x - x0) / fadeWidth
+          } else if (x >= x1 - fadeWidth) {
+            mult = (x1 - x) / fadeWidth
+          } else {
+            mult = 1
+          }
+          mult = Math.max(0, Math.min(1, mult))
+        }
+        const amp = Math.max(2, peaks[i] * (H - 16) * mult)
+        ctx.beginPath()
+        ctx.moveTo(x, (H - amp) / 2)
+        ctx.lineTo(x, (H + amp) / 2)
+        ctx.stroke()
+      }
+      // very subtle fill to strengthen the selection band
+      ctx.fillStyle = "rgba(34,211,238,0.06)"
+      ctx.fillRect(x0, 0, Math.max(0, x1 - x0), H)
+    }
+  }
+
+  const track = { file, buffer, durationMs, start:0, end:durationMs, clip, waveCanvas, selection, playhead, startHandle, endHandle, startInput, endInput, playBtn, raf: null, playStartAC: 0, playingNode: null, resumeAfterDrag:false, fadeEnabled:false, fadeToggle, pinSticky:false }
+  tracks.push(track)
+  activeTrack = track
+
+  function updateUI() {
+    const rect = waveCanvas.getBoundingClientRect()
+    const startPct = track.start / durationMs
+    const endPct = track.end / durationMs
+    const sx = rect.width * startPct
+    const ex = rect.width * endPct
+    const bwS = startHandle.getBoundingClientRect().width || 14
+    const bwE = endHandle.getBoundingClientRect().width || 14
+    // Align start handle's RIGHT edge to start (sx), and end handle's LEFT edge to end (ex)
+    startHandle.style.left = `${sx - bwS}px`
+    endHandle.style.left = `${ex}px`
+    selection.style.left = `${Math.min(sx, ex)}px`
+    selection.style.width = `${Math.abs(ex - sx)}px`
+    startInput.value = fmt(track.start)
+    endInput.value = fmt(track.end)
+    // draw with selection overlay (+ visual fades if enabled)
+    const dpr = window.devicePixelRatio || 1
+    const selMs = Math.max(1, track.end - track.start)
+    const fadeRatio = track.fadeEnabled ? Math.min(0.5, FADE_MS / selMs) : 0
+    const fadePx = (Math.abs(ex - sx)) * fadeRatio * dpr
+    draw(peaks, [sx * dpr, ex * dpr], fadePx)
+    // global start/end inputs removed
+    // If playing, keep playhead positioned
+    if (track.playingNode && track.playhead.style.display !== "none") {
+      positionPlayhead(track)
+    }
+  }
+
+  function rect() { return waveCanvas.getBoundingClientRect() }
+  function pxToMs(x) {
+    const r = rect()
+    const pct = Math.min(Math.max((x - r.left) / r.width, 0), 1)
+    return pct * durationMs
+  }
+
+  function drag(handle, isStart) {
+    let dragging = false
+    handle.addEventListener("mousedown", () => {
+      dragging = true
+      activeTrack = track
+      // If playing, stop and mark to resume after drop
+      if (track.playingNode) {
+        track.resumeAfterDrag = true
+        stopTrack(track)
+      }
+      playlist.resetOnNext = true
+      updateUI()
+    })
+    window.addEventListener("mouseup", () => {
+      if (!dragging) return
+      dragging = false
+      if (track.resumeAfterDrag) {
+        track.resumeAfterDrag = false
+        startPlayback(track, playlist.playing)
+      }
+    })
+    window.addEventListener("mousemove", e => {
+      if (!dragging) return
+      const value = pxToMs(e.clientX)
+      if (isStart) track.start = Math.min(value, track.end - 50)
+      else track.end = Math.max(value, track.start + 50)
+      updateUI()
+    })
+  }
+  drag(startHandle, true)
+  drag(endHandle, false)
+
+  // Drag entire selection area
+  ;(() => {
+    let dragging = false
+    let offsetMs = 0
+    let widthMs = 0
+    selection.addEventListener("mousedown", (e) => {
+      dragging = true
+      selection.style.cursor = "grabbing"
+      activeTrack = track
+      widthMs = Math.max(50, track.end - track.start)
+      offsetMs = pxToMs(e.clientX) - track.start
+      if (track.playingNode) {
+        track.resumeAfterDrag = true
+        stopTrack(track)
+      }
+      playlist.resetOnNext = true
+      e.preventDefault()
+    })
+    window.addEventListener("mouseup", () => {
+      if (!dragging) return
+      dragging = false
+      selection.style.cursor = "grab"
+      if (track.resumeAfterDrag) {
+        track.resumeAfterDrag = false
+        startPlayback(track, playlist.playing)
+      }
+    })
+    window.addEventListener("mousemove", (e) => {
+      if (!dragging) return
+      const desiredStart = pxToMs(e.clientX) - offsetMs
+      const clampedStart = Math.max(0, Math.min(desiredStart, durationMs - widthMs))
+      track.start = clampedStart
+      track.end = clampedStart + widthMs
+      updateUI()
+    })
+  })()
+
+  // Scrub/playhead drag on waveform or playhead
+  ;(() => {
+    let scrubbing = false
+    function begin(e) {
+      scrubbing = true
+      activeTrack = track
+      const absMs = pxToMs(e.clientX)
+      // make pin sticky during scrubbing
+      track.pinSticky = true
+      // if playing, stop and mark to resume at new spot
+      if (track.playingNode) {
+        track.resumeAfterDrag = true
+        stopTrack(track)
+      }
+      positionPlayheadAtAbsMs(track, absMs)
+      e.preventDefault()
+    }
+    function move(e) {
+      if (!scrubbing) return
+      const absMs = pxToMs(e.clientX)
+      positionPlayheadAtAbsMs(track, absMs)
+      e.preventDefault()
+    }
+    function end() {
+      if (!scrubbing) return
+      scrubbing = false
+      if (track.resumeAfterDrag) {
+        const abs = track.scrubAbsMs || track.start
+        const offset = Math.max(0, abs - track.start)
+        const totalSelMs = Math.max(10, track.end - track.start)
+        const remainingMs = totalSelMs - Math.min(offset, totalSelMs - 10)
+        // If too close to the end, don't auto-play; keep pin visible at drop
+        if (remainingMs < 250) {
+          track.resumeAfterDrag = false
+          // Ensure pin remains visible at the dropped spot
+          positionPlayheadAtAbsMs(track, abs)
+          track.pinSticky = true
+          return
+        }
+        track.resumeAfterDrag = false
+        track.pinSticky = false
+        // resume same mode as before: if playlist was playing, continueToNext true; else false
+        startPlayback(track, playlist.playing, offset)
+      } else {
+        // Not resuming; ensure pin remains visible at drop
+        positionPlayheadAtAbsMs(track, track.scrubAbsMs || track.start)
+        track.pinSticky = true
+      }
+    }
+    track.waveCanvas.addEventListener("mousedown", begin)
+    track.playhead.addEventListener("mousedown", begin)
+    window.addEventListener("mousemove", move)
+    window.addEventListener("mouseup", end)
+  })()
+
+  startInput.addEventListener("change", () => {
+    activeTrack = track
+    track.start = Math.min(parseTime(startInput.value), track.end - 50)
+    updateUI()
+  })
+  endInput.addEventListener("change", () => {
+    activeTrack = track
+    track.end = Math.max(parseTime(endInput.value), track.start + 50)
+    updateUI()
+  })
+  window.addEventListener("resize", updateUI)
+
+  // Playback toggle and sequential start
+  playBtn.addEventListener("click", () => togglePlay(track))
+  // Fade toggle
+  fadeToggle.addEventListener("change", () => {
+    track.fadeEnabled = !!fadeToggle.checked
+    // If in playlist, reset so play all restarts to honor new fades
+    playlist.resetOnNext = true
+  })
+  // DnD: drag start via handle only
+  dragHandle.addEventListener('dragstart', (e) => {
+    dnd.dragging = track
+    // stop playback during reorder
+    if (playlist.playing || tracks.some(t=>t.playingNode)) {
+      playlist.paused = true
+      playlist.playing = false
+      if (playlist.raf) cancelAnimationFrame(playlist.raf)
+      stopAll()
+      playAllBtn.querySelector('span').textContent = 'Resume'
+    }
+    track.clip.classList.add('drag-ghost')
+    e.dataTransfer.effectAllowed = 'move'
+    try { e.dataTransfer.setData('text/plain', trackId) } catch(_) {}
+    document.body.classList.add('dragging')
+    clipsContainer.classList.add('clips-dropping')
+  })
+  dragHandle.addEventListener('dragend', () => {
+    track.clip.classList.remove('drag-ghost')
+    dnd.dragging = null
+    dnd.overRow = null
+    try { dropMarker.remove() } catch {}
+    clipsContainer.classList.remove('clips-dropping')
+    document.body.classList.remove('dragging')
+  })
+
+  clip.querySelector(".remove").onclick = () => {
+    if (track.playingNode) try { track.playingNode.stop() } catch {}
+    if (track.raf) cancelAnimationFrame(track.raf)
+    stopTrack(track, true)
+    clip.remove()
+    tracks = tracks.filter(t => t !== track)
+    if (activeTrack === track) { activeTrack = tracks[0] || null }
+  }
+
+  draw(peaks, null)
+  updateUI()
+  clipsContainer.appendChild(clip)
+}
+
+function positionPlayhead(track) {
+  const rect = track.waveCanvas.getBoundingClientRect()
+  const selW = rect.width * ((track.end - track.start) / track.durationMs)
+  const sx = rect.width * (track.start / track.durationMs)
+  const ac = getAudioContext()
+  const elapsed = Math.max(0, Math.min((ac.currentTime - track.playStartAC), (track.end-track.start)/1000))
+  const ratio = elapsed / ((track.end-track.start)/1000 || 1)
+  const x = sx + selW * ratio
+  track.playhead.style.left = `${x}px`
+  track.playhead.setAttribute("data-time", fmt(track.start + elapsed*1000))
+}
+function positionPlayheadAtAbsMs(track, absMs) {
+  const rect = track.waveCanvas.getBoundingClientRect()
+  const selW = rect.width * ((track.end - track.start) / track.durationMs)
+  const sx = rect.width * (track.start / track.durationMs)
+  const clamped = Math.max(track.start, Math.min(track.end, absMs))
+  const ratio = (clamped - track.start) / Math.max(1, (track.end - track.start))
+  const x = sx + selW * ratio
+  track.playhead.style.display = "block"
+  track.playhead.style.left = `${x}px`
+  track.playhead.setAttribute("data-time", fmt(clamped))
+  // store for resume
+  track.scrubAbsMs = clamped
+}
+function animatePlayhead(track, durationSec) {
+  const tick = () => {
+    if (!track.playingNode) return
+    positionPlayhead(track)
+    // hide if reached end (safety)
+    const ac = getAudioContext()
+    if (ac.currentTime - track.playStartAC > durationSec + 0.05) {
+      track.playhead.style.display = "none"
+      return
+    }
+    track.raf = requestAnimationFrame(tick)
+  }
+  track.raf = requestAnimationFrame(tick)
+}
+
+// Global playback helpers (sequential)
+function stopTrack(track, forceHide = false) {
+  if (!track) return
+  if (track.playingNode) { try { track.playingNode.stop() } catch{} }
+  if (track.raf) cancelAnimationFrame(track.raf)
+  track.playingNode = null
+  if (track.playhead && (forceHide || !track.pinSticky)) track.playhead.style.display = "none"
+  if (track.playBtn) track.playBtn.textContent = "Play selection"
+}
+function stopAll() { tracks.forEach(stopTrack) }
+function startPlayback(track, continueToNext = true, offsetMs = 0, allowOverlap = false) {
+  const ac = getAudioContext()
+  // leaving sticky mode and stopping others if not overlapping
+  track.pinSticky = false
+  if (!allowOverlap) stopAll()
+  const src = ac.createBufferSource()
+  src.buffer = track.buffer
+  // Gain node for per-track fade
+  const gain = ac.createGain()
+  src.connect(gain)
+  gain.connect(ac.destination)
+  const totalSelMs = Math.max(10, (track.end - track.start))
+  const clampedOffset = Math.max(0, Math.min(offsetMs, totalSelMs - 10))
+  const durSec = Math.max(0.01, (totalSelMs - clampedOffset) / 1000)
+  const now = ac.currentTime
+  src.start(0, (track.start + clampedOffset)/1000, durSec)
+  track.playingNode = src
+  // set playStartAC so playhead math aligns even when resuming mid-selection
+  track.playStartAC = now - (clampedOffset/1000)
+  // Apply fade in/out on selected portion
+  const fadeSec = track.fadeEnabled ? Math.min(FADE_MS/1000, durSec/2) : 0
+  if (fadeSec > 0) {
+    gain.gain.setValueAtTime(0, now)
+    gain.gain.linearRampToValueAtTime(1, now + fadeSec)
+    // sustain at 1, then ramp down before end
+    const fadeOutStart = now + durSec - fadeSec
+    gain.gain.setValueAtTime(1, fadeOutStart)
+    gain.gain.linearRampToValueAtTime(0, now + durSec)
+  } else {
+    gain.gain.setValueAtTime(1, now)
+  }
+  if (track.playBtn) track.playBtn.textContent = "Stop"
+  if (track.playhead) {
+    track.playhead.style.display = "block"
+    positionPlayhead(track)
+    animatePlayhead(track, durSec)
+  }
+  src.onended = () => {
+    stopTrack(track)
+    // Only auto-advance during active playlist playback
+    if (!continueToNext || !playlist.playing) return
+    // If another track is already playing (crossfade case), don't start again
+    if (tracks.some(t => t !== track && t.playingNode)) return
+    const idx = tracks.indexOf(track)
+    if (idx < 0) return
+    let next = null
+    for (let i = idx + 1; i < tracks.length; i++) {
+      const t = tracks[i]
+      if (t && (t.end - t.start) > 1) { next = t; break }
+    }
+    if (next) startPlayback(next, true, 0)
+    else {
+      // reached end of playlist
+      playlist.playing = false
+      playlist.paused = false
+      playAllBtn.querySelector('span').textContent = 'Play all'
+      if (playlist.raf) cancelAnimationFrame(playlist.raf)
+      progressFill.style.width = '100%'
+      playlistTimeEl.textContent = fmtMin(totalSelectedMs())
+      playlistTotalEl.textContent = fmtMin(totalSelectedMs())
+    }
+  }
+  // If in playlist mode and allowed to advance, schedule crossfade start for next
+  if (continueToNext && playlist.playing && track.fadeEnabled) {
+    const idx = tracks.indexOf(track)
+    let next = null
+    for (let i = idx + 1; i < tracks.length; i++) {
+      const t = tracks[i]
+      if (t && (t.end - t.start) > 1) { next = t; break }
+    }
+    if (next && next.fadeEnabled) {
+      const crossSec = Math.min(FADE_MS/1000, durSec/2)
+      if (crossSec > 0.05) {
+        setTimeout(() => {
+          // ensure still playing playlist and current still active
+          if (!playlist.playing || !track.playingNode) return
+          // start next overlapping
+          startPlayback(next, true, 0, true)
+        }, Math.max(0, (durSec - crossSec) * 1000))
+      }
+    }
+  }
+}
+function togglePlay(track) {
+  if (track.playingNode) {
+    stopTrack(track)
+  } else {
+    // exit playlist mode when manually playing a single track
+    if (playlist.playing) { playlist.playing=false; if (playlist.raf) cancelAnimationFrame(playlist.raf) }
+    // play only this track; do not auto-advance
+    startPlayback(track, false)
+  }
+}
+
+// (Global start/end inputs removed)
+
+// Simple join (WAV)
+function extractSelection(track) {
+  const ac = getAudioContext()
+  const sr = ac.sampleRate
+  const startS = Math.floor((track.start/1000) * sr)
+  const endS = Math.floor((track.end/1000) * sr)
+  const len = Math.max(0, endS - startS)
+  const ch = Math.min(2, track.buffer.numberOfChannels)
+  const out = Array.from({length: ch}, () => new Float32Array(len))
+  for (let c=0;c<ch;c++) {
+    const src = track.buffer.getChannelData(Math.min(c, track.buffer.numberOfChannels-1))
+    for (let i=0;i<len;i++) out[c][i] = src[startS+i] || 0
+  }
+  return { channels: out, sampleRate: sr, fade: !!track.fadeEnabled }
+}
+function concatSegments(segments) {
+  if (!segments.length) return null
+  const sr = segments[0].sampleRate
+  const ch = segments[0].channels.length
+  const fadeSamplesBase = Math.floor((FADE_MS/1000) * sr)
+  // Pre-apply edge fades for each segment if requested
+  const segs = segments.map(seg => {
+    const len = seg.channels[0].length
+    const fadeS = seg.fade ? Math.min(fadeSamplesBase, Math.floor(len/2)) : 0
+    if (fadeS <= 0) return { ...seg, fadeS, skipStart: 0 }
+    const chan = seg.channels.map(chData => chData.slice()) // copy
+    // fade in
+    for (let i=0;i<fadeS;i++){
+      const g = i/(fadeS||1)
+      for (let c=0;c<ch;c++) chan[c][i] *= g
+    }
+    // fade out
+    for (let i=0;i<fadeS;i++){
+      const g = 1 - i/(fadeS||1)
+      const idx = len - fadeS + i
+      for (let c=0;c<ch;c++) chan[c][idx] *= g
+    }
+    return { channels: chan, sampleRate: seg.sampleRate, fade: seg.fade, fadeS, skipStart: 0 }
+  })
+  // Calculate total length accounting for crossfades
+  let total = 0
+  for (let i=0;i<segs.length;i++){
+    const cur = segs[i]
+    let overlap = 0
+    if (i < segs.length-1) {
+      const nxt = segs[i+1]
+      overlap = (cur.fade && nxt.fade) ? Math.min(cur.fadeS, nxt.fadeS) : 0
+    }
+    total += cur.channels[0].length - (i>0 ? (segs[i-1].fade && cur.fade ? Math.min(segs[i-1].fadeS, cur.fadeS) : 0) : 0)
+  }
+  const out = Array.from({length: ch}, () => new Float32Array(total))
+  let off = 0
+  for (let i=0;i<segs.length;i++){
+    const cur = segs[i]
+    const curLen = cur.channels[0].length
+    let copyFrom = cur.skipStart || 0
+    // If there was an overlap with previous, skip that from start
+    if (i>0 && segs[i-1].fade && cur.fade){
+      copyFrom = Math.max(copyFrom, Math.min(segs[i-1].fadeS, cur.fadeS))
+    }
+    // Determine overlap with next for crossfade mixing
+    let overlap = 0
+    if (i < segs.length-1 && cur.fade && segs[i+1].fade){
+      overlap = Math.min(cur.fadeS, segs[i+1].fadeS)
+    }
+    // Copy main body excluding tail overlap
+    const mainLen = curLen - copyFrom - overlap
+    if (mainLen > 0){
+      for (let c=0;c<ch;c++) {
+        out[c].set(cur.channels[c].subarray(copyFrom, copyFrom + mainLen), off)
+      }
+      off += mainLen
+    }
+    // Mix overlap region with next's head
+    if (overlap > 0){
+      const next = segs[i+1]
+      for (let k=0;k<overlap;k++){
+        const x = k/(overlap||1)
+        for (let c=0;c<ch;c++){
+          const a = cur.channels[c][curLen - overlap + k] || 0
+          const b = next.channels[c][k] || 0
+          out[c][off + k] = a * (1 - x) + b * x
+        }
+      }
+      off += overlap
+      // mark next to skip its overlapped head on its turn
+      next.skipStart = Math.max(next.skipStart||0, overlap)
+    }
+  }
+  return { channels: out, sampleRate: sr }
+}
+function toWavBlob({channels, sampleRate}) {
+  const ch = channels.length
+  const len = channels[0].length
+  const inter = new Float32Array(len*ch)
+  for (let i=0;i<len;i++) for (let c=0;c<ch;c++) inter[i*ch+c]=channels[c][i]
+  const buffer = new ArrayBuffer(44 + inter.length*2)
+  const view = new DataView(buffer)
+  writeStr('RIFF',0); view.setUint32(4, 36+inter.length*2, true); writeStr('WAVE',8)
+  writeStr('fmt ',12); view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,ch,true)
+  view.setUint32(24,sampleRate,true); view.setUint32(28,sampleRate*ch*2,true); view.setUint16(32,ch*2,true); view.setUint16(34,16,true)
+  writeStr('data',36); view.setUint32(40, inter.length*2, true)
+  let o=44; for (let i=0;i<inter.length;i++,o+=2){ let s=Math.max(-1,Math.min(1,inter[i])); view.setInt16(o, s<0?s*0x8000:s*0x7FFF, true) }
+  return new Blob([view],{type:'audio/wav'})
+  function writeStr(s,o){ for (let i=0;i<s.length;i++) view.setUint8(o+i, s.charCodeAt(i)) }
+}
+
+// MP3 export helpers (lamejs)
+function floatTo16PCM(float32Array){
+  const out = new Int16Array(float32Array.length);
+  for (let i=0;i<float32Array.length;i++){
+    let s = Math.max(-1, Math.min(1, float32Array[i]));
+    out[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  return out;
+}
+function toMp3Blob({channels, sampleRate}){
+  if (typeof lamejs === 'undefined') {
+    throw new Error('MP3 encoder (lamejs) not loaded');
+  }
+  const numChannels = Math.min(2, channels.length);
+  const leftF = channels[0];
+  const rightF = numChannels > 1 ? channels[1] : null;
+  const left = floatTo16PCM(leftF);
+  const right = rightF ? floatTo16PCM(rightF) : null;
+  const mp3enc = new lamejs.Mp3Encoder(numChannels, sampleRate, 192); // 192kbps
+  const blockSize = 1152;
+  const mp3Data = [];
+  for (let i = 0; i < left.length; i += blockSize) {
+    const l = left.subarray(i, i + blockSize);
+    let buf;
+    if (numChannels === 2) {
+      const r = right.subarray(i, i + blockSize);
+      buf = mp3enc.encodeBuffer(l, r);
+    } else {
+      buf = mp3enc.encodeBuffer(l);
+    }
+    if (buf.length) mp3Data.push(buf);
+  }
+  const end = mp3enc.flush();
+  if (end.length) mp3Data.push(end);
+  return new Blob(mp3Data, { type: 'audio/mpeg' });
+}
+document.getElementById("joinBtn").addEventListener("click", () => {
+  if (!tracks.length) return;
+  const segs = tracks.map(extractSelection);
+  const joined = concatSegments(segs); if (!joined) return;
+  const format = (document.getElementById('formatSel')?.value || 'wav').toLowerCase();
+  let blob, filename;
+  try {
+    if (format === 'mp3') {
+      blob = toMp3Blob(joined);
+      filename = 'joined.mp3';
+    } else {
+      blob = toWavBlob(joined);
+      filename = 'joined.wav';
+    }
+  } catch (e) {
+    console.warn('MP3 encode failed or library missing, falling back to WAV', e);
+    blob = toWavBlob(joined);
+    filename = 'joined.wav';
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+})
+
+// Play all in sequence with progress
+function firstSelectedIndex(){
+  for (let i=0;i<tracks.length;i++) if (selectedMs(tracks[i])>1) return i
+  return -1
+}
+function playlistProgressLoop(){
+  if (!playlist.playing){ return }
+  const total = totalSelectedMs()
+  playlistTotalEl.textContent = fmtMin(total)
+  let elapsed = 0
+  const current = tracks.find(t => t.playingNode)
+  const ac = getAudioContext()
+  for (const t of tracks) {
+    if (t === current) break
+    elapsed += selectedMs(t)
+  }
+  if (current){
+    const curDur = selectedMs(current)
+    const curElapsed = Math.min(curDur, Math.max(0, (ac.currentTime - (current.playStartAC||0))*1000))
+    elapsed += curElapsed
+  }
+  playlistTimeEl.textContent = fmtMin(elapsed)
+  const pct = total ? Math.min(100, (elapsed/total)*100) : 0
+  progressFill.style.width = `${pct}%`
+  playlist.raf = requestAnimationFrame(playlistProgressLoop)
+}
+playAllBtn.addEventListener('click', () => {
+  if (playlist.playing){
+    playlist.playing = false
+    if (playlist.raf) cancelAnimationFrame(playlist.raf)
+    // capture resume point
+    const ac = getAudioContext()
+    let elapsedBefore = 0
+    const currentIdx = tracks.findIndex(t => t.playingNode)
+    for (let i=0;i<tracks.length;i++){
+      if (i === currentIdx) break
+      elapsedBefore += selectedMs(tracks[i])
+    }
+    if (currentIdx >= 0) {
+      const cur = tracks[currentIdx]
+      const curElapsed = Math.min(selectedMs(cur), Math.max(0, (ac.currentTime - (cur.playStartAC||0))*1000))
+      playlist.resumeIndex = currentIdx
+      playlist.resumeOffsetMs = curElapsed
+      playlist.paused = true
+    } else {
+      playlist.resumeIndex = firstSelectedIndex()
+      playlist.resumeOffsetMs = 0
+      playlist.paused = true
+    }
+    stopAll()
+    playAllBtn.querySelector('span').textContent = 'Resume'
+    // keep progress/time where it is; total already updates in loop
+    return
+  }
+  // starting playback
+  let idx = firstSelectedIndex()
+  let offset = 0
+  if (playlist.paused && !playlist.resetOnNext){
+    idx = playlist.resumeIndex >= 0 ? playlist.resumeIndex : idx
+    offset = playlist.resumeOffsetMs || 0
+  }
+  if (idx < 0) return
+  playlist.playing = true
+  playlist.paused = false
+  playlist.resetOnNext = false
+  playlistTotalEl.textContent = fmtMin(totalSelectedMs())
+  playAllBtn.querySelector('span').textContent = 'Stop'
+  playlistProgressLoop()
+  startPlayback(tracks[idx], true, offset)
+})
+
+// DnD drop handling on the list container
+clipsContainer.addEventListener('dragover', (e) => {
+  if (!dnd.dragging) return
+  e.preventDefault()
+  const targetRow = e.target.closest('.track-row')
+  const list = clipsContainer
+  if (targetRow) {
+    const rect = targetRow.getBoundingClientRect()
+    const after = e.clientY > rect.top + rect.height/2
+    if (dnd.overRow !== targetRow || dnd.after !== after) {
+      dnd.overRow = targetRow
+      dnd.after = after
+      if (after) {
+        list.insertBefore(dropMarker, targetRow.nextSibling)
+      } else {
+        list.insertBefore(dropMarker, targetRow)
+      }
+      // force transition
+      requestAnimationFrame(() => {
+        clipsContainer.classList.add('clips-dropping')
+      })
+    }
+  } else {
+    // no row under cursor: append marker to end
+    if (list.lastElementChild !== dropMarker) {
+      list.appendChild(dropMarker)
+      requestAnimationFrame(() => {
+        clipsContainer.classList.add('clips-dropping')
+      })
+    }
+    dnd.overRow = null
+    dnd.after = false
+  }
+})
+clipsContainer.addEventListener('drop', (e) => {
+  if (!dnd.dragging) return
+  e.preventDefault()
+  const targetRow = e.target.closest('.track-row') || dropMarker.previousElementSibling || dropMarker.parentElement?.lastElementChild
+  const list = clipsContainer
+  const srcEl = dnd.dragging.clip
+  if (!targetRow || targetRow === srcEl) { dnd.dragging = null; try{dropMarker.remove()}catch{}; clipsContainer.classList.remove('clips-dropping'); return }
+  const after = dnd.after
+  if (after) list.insertBefore(srcEl, targetRow.nextSibling)
+  else list.insertBefore(srcEl, targetRow)
+  // rebuild tracks array to reflect new DOM order
+  const newOrder = []
+  ;[...list.querySelectorAll('.track-row')].forEach(node => {
+    const t = tracks.find(tt => tt.clip === node)
+    if (t) newOrder.push(t)
+  })
+  tracks = newOrder
+  dnd.dragging = null
+  dnd.overRow = null
+  try { dropMarker.remove() } catch {}
+  clipsContainer.classList.remove('clips-dropping')
+})
+</script>
+
+</body>
+</html>
