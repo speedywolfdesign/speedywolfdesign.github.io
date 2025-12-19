@@ -153,41 +153,72 @@
       <table id="usersTable">
         <thead>
           <tr>
-            <th></th>
+            <th><input id="selectAllUsers" type="checkbox"></th>
             <th>User ID</th>
             <th>Name</th>
+            <th id="licHeader" style="user-select:none; position:relative;">
+              <span id="licHeaderLabel" style="cursor:pointer;">License</span>
+              <button id="licFilterBtn" title="Filter license" style="margin-left:6px; background:none; border:1px solid #e5e7eb; border-radius:4px; padding:2px 4px; cursor:pointer;">
+                <svg id="licChevronIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#6b7280" width="12" height="12" style="vertical-align:-1px;">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.108l3.71-3.877a.75.75 0 1 1 1.08 1.04l-4.24 4.433a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <div id="licFilterMenu" style="display:none; position:absolute; top:24px; left:0; background:#fff; border:1px solid #e5e7eb; border-radius:6px; padding:8px; box-shadow:0 10px 20px rgba(0,0,0,.12); z-index:20; min-width:160px;">
+                <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:4px 0;">
+                  <input type="checkbox" id="licOptAll" checked>
+                  <span>All</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:4px 0;">
+                  <input type="checkbox" class="licOpt" value="basic">
+                  <span>Basic</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:4px 0;">
+                  <input type="checkbox" class="licOpt" value="standard">
+                  <span>Standard</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:4px 0;">
+                  <input type="checkbox" class="licOpt" value="changeadmin">
+                  <span>Change Admin</span>
+                </label>
+              </div>
+            </th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          <tr data-role="viewer">
+          <tr data-role="viewer" data-license="basic">
             <td><input type="checkbox"></td>
             <td>EAMINOFF</td>
             <td><span class="pill" style="background:#6366f1">EA</span>Erin Aminoff</td>
+            <td><span style="display:inline-block;padding:4px 8px;border-radius:6px;background:#eef2ff;color:#3730a3;font-size:12px;">Basic</span></td>
             <td><span class="active-dot"></span>Active</td>
           </tr>
-          <tr data-role="initiator">
+          <tr data-role="initiator" data-license="standard">
             <td><input type="checkbox"></td>
             <td>EMERSON</td>
             <td><span class="pill" style="background:#0ea5e9">EH</span>Emerson Herwitz</td>
+            <td><span style="display:inline-block;padding:4px 8px;border-radius:6px;background:#ecfeff;color:#155e75;font-size:12px;">Standard</span></td>
             <td><span class="active-dot"></span>Active</td>
           </tr>
-          <tr data-role="reviewer">
+          <tr data-role="reviewer" data-license="standard">
             <td><input type="checkbox"></td>
             <td>JBAPTISTA</td>
             <td><span class="pill" style="background:#4f46e5">JB</span>Jaydon Baptista</td>
+            <td><span style="display:inline-block;padding:4px 8px;border-radius:6px;background:#ecfeff;color:#155e75;font-size:12px;">Standard</span></td>
             <td><span class="active-dot"></span>Active</td>
           </tr>
-          <tr data-role="approver">
+          <tr data-role="approver" data-license="changeAdmin">
             <td><input type="checkbox"></td>
             <td>KLEE</td>
             <td><span class="pill" style="background:#10b981">KL</span>Kai Lee</td>
+            <td><span style="display:inline-block;padding:4px 8px;border-radius:6px;background:#f0fdf4;color:#166534;font-size:12px;">Change&nbsp;Admin</span></td>
             <td><span class="active-dot"></span>Active</td>
           </tr>
-          <tr data-role="full">
+          <tr data-role="full" data-license="changeAdmin">
             <td><input type="checkbox"></td>
             <td>MRODRIGUEZ</td>
             <td><span class="pill" style="background:#a855f7">MR</span>Marisol Rodriguez</td>
+            <td><span style="display:inline-block;padding:4px 8px;border-radius:6px;background:#f0fdf4;color:#166534;font-size:12px;">Change&nbsp;Admin</span></td>
             <td><span class="active-dot"></span>Active</td>
           </tr>
         </tbody>
@@ -232,12 +263,19 @@
   </div>
 </div>
 
+<!-- (License editing UI removed per rollback) -->
+
 <script>
   const roleOrder = ['viewer','initiator','reviewer','approver','full'];
   const userRows = document.querySelectorAll('#usersTable tbody tr');
   const permCheckboxes = document.querySelectorAll('#permissionMatrix input');
   const warning = document.getElementById('globalWarning');
   const summary = document.getElementById('conflictSummary');
+  const selectAllUsersCb = document.getElementById('selectAllUsers');
+  const licHeaderLabel = document.getElementById('licHeaderLabel');
+  const licFilterBtn = document.getElementById('licFilterBtn');
+  const licFilterMenu = document.getElementById('licFilterMenu');
+  const licOptAll = document.getElementById('licOptAll');
 
   const truncateName = (name, max=14) =>
     name.length <= max ? name : `${name.slice(0,5)}…${name.slice(-3)}`;
@@ -266,6 +304,29 @@
     const permsToCheck = allGranularChecked ? perms.filter(p => p !== 'full') : perms;
     let conflicts = [];
 
+    // If user selects permissions first, prompt to select users
+    if (!users.length && permsToCheck.length) {
+      warning.style.display = 'block';
+      warning.innerText = 'ℹ️ Select users to apply permissions.';
+      summary.style.display = 'none';
+      return;
+    }
+
+    // If multiple users with different roles/permissions are selected, show a top warning
+    const uniqueRoles = Array.from(new Set(users.map(u => u.role)));
+    if (users.length > 1 && uniqueRoles.length > 1) {
+      warning.style.display = 'block';
+      warning.innerText = '⚠️ Selected users have different roles. Applying the same permission may cause conflicts.';
+      summary.style.display = 'none';
+      // Disable permission controls until the selection is resolved
+      permCheckboxes.forEach(cb => {
+        cb.disabled = true;
+        cb.classList.add('tooltip');
+        cb.setAttribute('data-tooltip', 'Resolve selection: choose users with the same role or unselect users to enable permissions.');
+      });
+      return;
+    }
+
     permsToCheck.forEach(p =>
       users.forEach(u => {
         if (roleOrder.indexOf(p) > roleOrder.indexOf(u.role)) {
@@ -280,27 +341,36 @@
       cb.removeAttribute('data-tooltip');
     });
 
-    if (!conflicts.length) {
-      warning.style.display = summary.style.display = 'none';
-      return;
-    }
-
-    // When any conflicts exist, Full access cannot be checked; include conflicting user names
+    // Full access tooltip/disable: compute hypothetically for selected users
     const fullPerm = [...permCheckboxes].find(cb => cb.dataset.perm === 'full');
     if (fullPerm) {
-      const conflictNames = [...new Set(conflicts.map(c => c.user.name))];
-      fullPerm.checked = false;
-      fullPerm.disabled = true;
-      fullPerm.classList.add('conflict','tooltip');
-      fullPerm.setAttribute(
-        'data-tooltip',
-        `Full access disabled due to conflicts with:\n` + conflictNames.map(n => `• ${n}`).join('\n')
-      );
+      const fullConflictUsers = users.filter(u => roleOrder.indexOf('full') > roleOrder.indexOf(u.role)).map(u => u.name);
+      // Reset any prior tooltip styles
+      fullPerm.classList.remove('conflict','tooltip');
+      fullPerm.removeAttribute('data-tooltip');
+      fullPerm.disabled = false;
+      if (fullConflictUsers.length > 0) {
+        fullPerm.checked = false;
+        fullPerm.disabled = true;
+        fullPerm.classList.add('conflict','tooltip');
+        fullPerm.setAttribute(
+          'data-tooltip',
+          'Not allowed for:\n' + fullConflictUsers.map(n => `• ${truncateName(n)}`).join('\n') + '\n\nConsider upgrading their role.'
+        );
+      }
     }
 
     const conflictedPerms = [...new Set(conflicts.map(c => c.perm))];
     const conflictedUsers = [...new Set(conflicts.map(c => c.user.name))];
 
+    if (!conflicts.length) {
+      // If we already showed role mismatch warning above, keep it; otherwise clear banner
+      if (!(users.length > 1 && uniqueRoles.length > 1)) {
+        warning.style.display = summary.style.display = 'none';
+      }
+      updateSelectAllState();
+      return;
+    }
     warning.style.display = summary.style.display = 'block';
     warning.innerText = '⚠️ Permission conflict detected. Some permissions were removed.';
     summary.innerHTML =
@@ -323,6 +393,23 @@
         );
       }
     });
+
+    // Keep "Full access" in sync with granular permissions:
+    // - Checked only when all granular are checked
+    // - Unchecked if any granular is unchecked
+    const granularPerms = ['initiator','viewer','reviewer','approver'];
+    const fullCbSync = [...permCheckboxes].find(c => c.dataset.perm === 'full');
+    const allGranularNowChecked = granularPerms.every(p => {
+      const el = [...permCheckboxes].find(c => c.dataset.perm === p);
+      return !!(el && el.checked);
+    });
+    if (fullCbSync) {
+      if (allGranularNowChecked && !fullCbSync.disabled) {
+        fullCbSync.checked = true;
+      } else {
+        fullCbSync.checked = false;
+      }
+    }
   }
 
   userRows.forEach(row => {
@@ -330,6 +417,7 @@
     cb.addEventListener('change', () => {
       row.classList.toggle('selected', cb.checked);
       validatePermissions();
+      updateSelectAllState();
     });
   });
 
@@ -363,6 +451,128 @@
       validatePermissions();
     });
   });
+
+  // License filter dropdown behavior
+  (function wireLicenseFilter(){
+    if (!licFilterBtn || !licFilterMenu) return;
+    let selectedSet = new Set(); // empty = All
+    const licOpts = [...document.querySelectorAll('.licOpt')];
+    const totalOpts = licOpts.length;
+    function applyFilter() {
+      const rows = [...document.querySelectorAll('#usersTable tbody tr')];
+      const isAll = (licOptAll && licOptAll.checked) || selectedSet.size === totalOpts;
+      rows.forEach(row => {
+        const lic = (row.dataset.license || '').toLowerCase();
+        const visible = isAll ? true : (selectedSet.size > 0 ? selectedSet.has(lic) : false);
+        row.style.display = visible ? '' : 'none';
+      });
+      // Update header label suffix
+      const labelBase = 'License';
+      if (isAll) {
+        licHeaderLabel.textContent = `${labelBase} (All)`;
+        if (licOptAll) {
+          licOptAll.checked = true;
+          licOptAll.indeterminate = false;
+        }
+      } else {
+        const order = ['basic','standard','changeadmin'];
+        const pretty = { basic:'Basic', standard:'Standard', changeadmin:'Change Admin' };
+        const list = order.filter(o => selectedSet.has(o)).map(o => pretty[o]);
+        licHeaderLabel.textContent = list.length ? `${labelBase} (${list.join(', ')})` : `${labelBase} (None)`;
+        if (licOptAll) {
+          // If partial selection, reflect via indeterminate
+          licOptAll.checked = selectedSet.size === totalOpts;
+          licOptAll.indeterminate = selectedSet.size > 0 && selectedSet.size < totalOpts;
+        }
+      }
+    }
+    function closeMenu() { licFilterMenu.style.display = 'none'; }
+    licFilterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      licFilterMenu.style.display = licFilterMenu.style.display === 'none' ? 'block' : 'none';
+    });
+    document.addEventListener('click', (e) => {
+      if (!licFilterMenu.contains(e.target) && e.target !== licFilterBtn) closeMenu();
+    });
+    licOptAll?.addEventListener('change', () => {
+      // Copy user-table select-all logic: All toggles all specific options
+      if (licOptAll.checked) {
+        licOpts.forEach(i => i.checked = true);
+        selectedSet = new Set(licOpts.map(i => (i.value || '').toLowerCase()));
+        licOptAll.indeterminate = false;
+      } else {
+        licOpts.forEach(i => i.checked = false);
+        selectedSet.clear();
+        licOptAll.indeterminate = false;
+      }
+      applyFilter();
+    });
+    licOpts.forEach(i => {
+      i.addEventListener('change', () => {
+        // rebuild selected set from current checkboxes
+        selectedSet = new Set(licOpts.filter(x => x.checked).map(x => (x.value || '').toLowerCase()));
+      // Update All checkbox to mirror user-table logic
+      licOptAll.checked = selectedSet.size === totalOpts;
+      licOptAll.indeterminate = selectedSet.size > 0 && selectedSet.size < totalOpts;
+        applyFilter();
+      });
+    });
+    applyFilter();
+  })();
+
+  // License column sort
+  (function wireLicenseSort(){
+    const header = document.getElementById('licHeader');
+    const icon = document.getElementById('licSortIcon');
+    if (!header || !icon) return;
+    let asc = true;
+    const licOrder = { 'basic':0, 'standard':1, 'changeadmin':2 };
+    header.addEventListener('click', () => {
+      const tbody = document.querySelector('#usersTable tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a,b) => {
+        const la = (a.dataset.license || '').toLowerCase();
+        const lb = (b.dataset.license || '').toLowerCase();
+        const av = licOrder.hasOwnProperty(la) ? licOrder[la] : 99;
+        const bv = licOrder.hasOwnProperty(lb) ? licOrder[lb] : 99;
+        return asc ? (av - bv) : (bv - av);
+      });
+      rows.forEach(r => tbody.appendChild(r));
+      icon.style.transform = asc ? 'rotate(180deg)' : 'rotate(0deg)';
+      asc = !asc;
+    });
+  })();
+
+  // Select-all master checkbox
+  function updateSelectAllState() {
+    if (!selectAllUsersCb) return;
+    const rowCbs = [...document.querySelectorAll('#usersTable tbody input[type="checkbox"]')];
+    const enabled = rowCbs.filter(i => !i.disabled);
+    const checkedEnabled = enabled.filter(i => i.checked);
+    if (enabled.length === 0) {
+      selectAllUsersCb.indeterminate = false;
+      selectAllUsersCb.checked = false;
+      return;
+    }
+    selectAllUsersCb.indeterminate = checkedEnabled.length > 0 && checkedEnabled.length < enabled.length;
+    selectAllUsersCb.checked = checkedEnabled.length === enabled.length;
+  }
+  if (selectAllUsersCb) {
+    selectAllUsersCb.addEventListener('change', () => {
+      const shouldCheck = !!selectAllUsersCb.checked;
+      document.querySelectorAll('#usersTable tbody tr').forEach(row => {
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (!cb) return;
+        if (cb.disabled && shouldCheck) return;
+        cb.checked = shouldCheck && !cb.disabled;
+        row.classList.toggle('selected', cb.checked);
+      });
+      validatePermissions();
+      updateSelectAllState();
+    });
+  }
+  // initialize
+  updateSelectAllState();
 </script>
 
 </body>
